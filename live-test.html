@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Notes Wallah — Test</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --navy:#132242; --navy-light:#1D3560; --gold:#E8A33D; --gold-light:#F6D9A6;
+    --cream:#F7F5F0; --ink:#1B1B1B; --grey:#6B7280; --green:#2E8B57; --red:#C0392B; --purple:#8E44AD;
+    --radius:16px; --shadow: 0 4px 16px rgba(19,34,66,0.08);
+  }
+  *{box-sizing:border-box; margin:0; padding:0;}
+  body{ font-family:'Inter', sans-serif; background:var(--cream); color:var(--ink); display:flex; justify-content:center; }
+  .phone{ width:100%; max-width:430px; min-height:100vh; background:var(--cream); padding-bottom:130px; position:relative; }
+  h1,h2,h3{ font-family:'Fraunces', serif; }
+
+  .topbar{
+    background:var(--navy); color:white; padding:14px 18px;
+    display:flex; justify-content:space-between; align-items:center;
+  }
+  .q-progress{ font-size:13px; font-weight:600; opacity:0.85; }
+  .timer{
+    background:rgba(255,255,255,0.12); padding:7px 14px; border-radius:20px;
+    font-weight:700; font-size:14px; display:flex; align-items:center; gap:6px;
+  }
+  .timer.warning{ background:var(--red); }
+
+  .palette-strip{
+    display:flex; gap:7px; padding:12px 18px; overflow-x:auto; background:white; box-shadow:var(--shadow);
+  }
+  .palette-strip::-webkit-scrollbar{ display:none; }
+  .p-item{
+    min-width:32px; height:32px; border-radius:8px; background:#EEE;
+    display:flex; align-items:center; justify-content:center; font-size:12px; font-weight:700; color:var(--grey);
+    flex-shrink:0; cursor:pointer;
+  }
+  .p-item.answered{ background:var(--green); color:white; }
+  .p-item.marked{ background:var(--purple); color:white; }
+  .p-item.current{ outline:2.5px solid var(--gold); }
+
+  .content{ padding:20px 18px; }
+  .q-card{
+    background:white; border-radius:var(--radius); box-shadow:var(--shadow); padding:20px;
+  }
+  .q-text{ font-size:15.5px; font-weight:600; line-height:1.5; margin-bottom:18px; }
+  .option{
+    display:flex; align-items:center; gap:12px; padding:13px 14px; border-radius:12px;
+    border:1.5px solid #E8E6E0; margin-bottom:10px; cursor:pointer; font-size:14px;
+  }
+  .option.selected{ border-color:var(--navy); background:#F0F3FA; }
+  .opt-letter{
+    width:26px; height:26px; border-radius:50%; background:var(--cream);
+    display:flex; align-items:center; justify-content:center; font-size:12px; font-weight:700; color:var(--navy); flex-shrink:0;
+  }
+  .option.selected .opt-letter{ background:var(--navy); color:white; }
+
+  .bottom-controls{
+    position:fixed; bottom:0; width:100%; max-width:430px; background:white;
+    box-shadow:0 -4px 16px rgba(0,0,0,0.06); padding:12px 18px 18px;
+  }
+  .control-row{ display:flex; gap:8px; margin-bottom:8px; }
+  .ctrl-btn{
+    flex:1; padding:12px; border-radius:12px; font-size:12.5px; font-weight:700; border:none; cursor:pointer; text-align:center;
+  }
+  .ctrl-btn.mark{ background:var(--gold-light); color:#8A5A00; }
+  .ctrl-btn.next{ background:var(--navy); color:white; }
+  .ctrl-btn.prev{ background:#EEE; color:var(--grey); }
+  .submit-btn{
+    width:100%; background:var(--red); color:white; border:none;
+    padding:12px; border-radius:12px; font-size:13px; font-weight:700; cursor:pointer;
+  }
+
+  .overlay{
+    position:fixed; inset:0; background:rgba(19,34,66,0.55); display:none;
+    align-items:center; justify-content:center; z-index:20;
+  }
+  .overlay.show{ display:flex; }
+  .modal{
+    background:white; border-radius:18px; padding:24px; width:85%; max-width:340px; text-align:center;
+  }
+  .modal h3{ font-size:17px; color:var(--navy); margin-bottom:10px; }
+  .modal p{ font-size:13px; color:var(--grey); margin-bottom:16px; line-height:1.5; }
+  .modal-btn{
+    width:100%; padding:12px; border-radius:10px; font-weight:700; font-size:13.5px; border:none; margin-bottom:8px; cursor:pointer;
+  }
+  .modal-btn.confirm{ background:var(--red); color:white; }
+  .modal-btn.cancel{ background:#EEE; color:var(--ink); }
+</style>
+</head>
+<body>
+
+<div class="phone">
+  <div class="topbar">
+    <div class="q-progress" id="qProgress">Question 1 of 15</div>
+    <div class="timer" id="timerDisplay">⏱ 20:00</div>
+  </div>
+
+  <div class="palette-strip" id="paletteStrip"></div>
+
+  <div class="content">
+    <div class="q-card">
+      <div class="q-text" id="qText"></div>
+      <div id="optionsArea"></div>
+    </div>
+  </div>
+
+  <div class="bottom-controls">
+    <div class="control-row">
+      <button class="ctrl-btn prev" onclick="goPrev()">← Previous</button>
+      <button class="ctrl-btn mark" onclick="markReview()">🚩 Mark for Review</button>
+      <button class="ctrl-btn next" onclick="goNext()">Next →</button>
+    </div>
+    <button class="submit-btn" onclick="showSubmitModal()">Submit Test</button>
+  </div>
+</div>
+
+<div class="overlay" id="submitOverlay">
+  <div class="modal">
+    <h3>Submit Test?</h3>
+    <p id="submitSummary">Answered: 0 · Not Answered: 15 · Marked: 0</p>
+    <button class="modal-btn confirm" onclick="submitTest()">Yes, Submit</button>
+    <button class="modal-btn cancel" onclick="hideSubmitModal()">Continue Test</button>
+  </div>
+</div>
+
+<script>
+  // Dummy question bank — will later come from the database/question bank
+  const questions = [
+    {q:"Which of the following is a linear equation in two variables?", options:["x² + y = 5","2x + 3y = 7","xy = 10","x + y² = 4"], correct:1},
+    {q:"The pair of equations x=2 and y=3 represents lines that are:", options:["Parallel","Intersecting at (2,3)","Coincident","Perpendicular only"], correct:1},
+    {q:"For a pair of linear equations to have a unique solution, the lines must be:", options:["Parallel","Coincident","Intersecting","None of these"], correct:2},
+    {q:"If a₁/a₂ = b₁/b₂ = c₁/c₂, the pair of equations has:", options:["No solution","Unique solution","Infinitely many solutions","Cannot be determined"], correct:2},
+    {q:"The graphical method of solving equations uses which type of representation?", options:["Bar graph","Straight lines","Pie chart","Histogram"], correct:1},
+    {q:"Which method involves substituting one variable's value into the other equation?", options:["Elimination method","Substitution method","Cross-multiplication","Graphical method"], correct:1},
+    {q:"If two lines are parallel, the pair of equations has:", options:["Unique solution","No solution","Infinite solutions","Two solutions"], correct:1},
+    {q:"2x + y = 5 and 3x + 2y = 8 — solving gives x = ?", options:["1","2","3","0"], correct:1},
+    {q:"The condition a₁/a₂ ≠ b₁/b₂ indicates the equations are:", options:["Consistent with unique solution","Inconsistent","Dependent","Coincident"], correct:0},
+    {q:"Coincident lines represent equations that are:", options:["Independent","Dependent and consistent","Inconsistent","Perpendicular"], correct:1},
+    {q:"In the elimination method, we aim to:", options:["Graph both lines","Eliminate one variable by adding/subtracting equations","Multiply variables","Divide the equations"], correct:1},
+    {q:"How many solutions does an inconsistent pair of equations have?", options:["One","Two","Infinite","None"], correct:3},
+    {q:"The equations 2x+3y=9 and 4x+6y=18 are:", options:["Inconsistent","Coincident (infinite solutions)","Intersecting","Perpendicular"], correct:1},
+    {q:"Cross-multiplication method is used to find:", options:["Only x","Only y","Both x and y directly","Neither"], correct:2},
+    {q:"A pair of linear equations in two variables can be represented graphically as:", options:["Curves","Two lines","Circles","Parabolas"], correct:1}
+  ];
+
+  let current = 0;
+  let answers = new Array(questions.length).fill(null);
+  let marked = new Array(questions.length).fill(false);
+  let timeLeft = 20 * 60;
+
+  function renderPalette(){
+    const strip = document.getElementById('paletteStrip');
+    strip.innerHTML = '';
+    questions.forEach((q, i) => {
+      const item = document.createElement('div');
+      item.className = 'p-item';
+      if (i === current) item.classList.add('current');
+      if (marked[i]) item.classList.add('marked');
+      else if (answers[i] !== null) item.classList.add('answered');
+      item.textContent = i + 1;
+      item.onclick = () => { current = i; render(); };
+      strip.appendChild(item);
+    });
+  }
+
+  function render(){
+    document.getElementById('qProgress').textContent = `Question ${current+1} of ${questions.length}`;
+    document.getElementById('qText').textContent = questions[current].q;
+    const area = document.getElementById('optionsArea');
+    area.innerHTML = '';
+    questions[current].options.forEach((opt, i) => {
+      const div = document.createElement('div');
+      div.className = 'option' + (answers[current] === i ? ' selected' : '');
+      div.innerHTML = `<div class="opt-letter">${String.fromCharCode(65+i)}</div><div>${opt}</div>`;
+      div.onclick = () => { answers[current] = i; render(); renderPalette(); };
+      area.appendChild(div);
+    });
+    renderPalette();
+  }
+
+  function goNext(){ if(current < questions.length - 1){ current++; render(); } }
+  function goPrev(){ if(current > 0){ current--; render(); } }
+  function markReview(){ marked[current] = !marked[current]; render(); }
+
+  function showSubmitModal(){
+    const answered = answers.filter(a => a !== null).length;
+    const markedCount = marked.filter(m => m).length;
+    document.getElementById('submitSummary').textContent =
+      `Answered: ${answered} · Not Answered: ${questions.length - answered} · Marked: ${markedCount}`;
+    document.getElementById('submitOverlay').classList.add('show');
+  }
+  function hideSubmitModal(){ document.getElementById('submitOverlay').classList.remove('show'); }
+
+  function submitTest(){
+    let score = 0;
+    questions.forEach((q, i) => { if (answers[i] === q.correct) score++; });
+    localStorage.setItem('nw_lastScore', score);
+    localStorage.setItem('nw_lastTotal', questions.length);
+    localStorage.setItem('nw_lastAnswers', JSON.stringify(answers));
+    window.location.href = 'result.html';
+  }
+
+  // Timer
+  const timerEl = document.getElementById('timerDisplay');
+  const timerInterval = setInterval(() => {
+    timeLeft--;
+    const m = Math.floor(timeLeft / 60);
+    const s = timeLeft % 60;
+    timerEl.textContent = `⏱ ${m}:${s < 10 ? '0' : ''}${s}`;
+    if (timeLeft <= 120) timerEl.classList.add('warning');
+    if (timeLeft <= 0){ clearInterval(timerInterval); submitTest(); }
+  }, 1000);
+
+  render();
+</script>
+
+</body>
+</html>

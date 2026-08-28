@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Notes Wallah — Result</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --navy:#132242; --navy-light:#1D3560; --gold:#E8A33D; --gold-light:#F6D9A6;
+    --cream:#F7F5F0; --ink:#1B1B1B; --grey:#6B7280; --green:#2E8B57; --red:#C0392B;
+    --radius:16px; --shadow: 0 4px 16px rgba(19,34,66,0.08);
+  }
+  *{box-sizing:border-box; margin:0; padding:0;}
+  body{ font-family:'Inter', sans-serif; background:var(--cream); color:var(--ink); display:flex; justify-content:center; }
+  .phone{ width:100%; max-width:430px; min-height:100vh; background:var(--cream); padding-bottom:40px; }
+  h1,h2,h3{ font-family:'Fraunces', serif; }
+
+  .topbar{
+    background:var(--navy); color:white; padding:26px 20px 30px; text-align:center;
+    border-radius:0 0 28px 28px;
+  }
+  .result-tag{ font-size:12px; font-weight:700; letter-spacing:0.6px; text-transform:uppercase; opacity:0.7; }
+  .big-score{ font-size:44px; font-weight:700; margin:8px 0 4px; }
+  .score-sub{ font-size:13px; opacity:0.75; }
+  .pass-badge{
+    display:inline-block; margin-top:12px; padding:6px 16px; border-radius:20px;
+    font-size:12.5px; font-weight:700;
+  }
+  .pass-badge.pass{ background:var(--green); color:white; }
+  .pass-badge.fail{ background:var(--red); color:white; }
+
+  .content{ padding:20px; }
+  .stat-grid{ display:grid; grid-template-columns:1fr 1fr 1fr; gap:10px; margin-bottom:16px; }
+  .stat-box{
+    background:white; border-radius:14px; box-shadow:var(--shadow); padding:14px 8px; text-align:center;
+  }
+  .stat-box .num{ font-size:18px; font-weight:700; color:var(--navy); font-family:'Fraunces'; }
+  .stat-box .lbl{ font-size:10.5px; color:var(--grey); margin-top:3px; }
+
+  .action-btn{
+    width:100%; padding:14px; border-radius:14px; font-size:14px; font-weight:700;
+    border:none; margin-bottom:10px; cursor:pointer; text-decoration:none; display:block; text-align:center;
+  }
+  .action-btn.primary{ background:var(--navy); color:white; }
+  .action-btn.secondary{ background:white; color:var(--navy); box-shadow:var(--shadow); }
+  .action-btn.gold{ background:var(--gold); color:var(--navy); }
+</style>
+</head>
+<body>
+
+<div class="phone">
+  <div class="topbar">
+    <div class="result-tag">Test Completed</div>
+    <div class="big-score" id="scoreDisplay">--</div>
+    <div class="score-sub" id="scoreSub">Pair of Linear Equations · Mathematics</div>
+    <div class="pass-badge" id="passBadge">--</div>
+  </div>
+
+  <div class="content">
+    <div class="stat-grid">
+      <div class="stat-box">
+        <div class="num" id="correctCount">-</div>
+        <div class="lbl">Correct</div>
+      </div>
+      <div class="stat-box">
+        <div class="num" id="wrongCount">-</div>
+        <div class="lbl">Incorrect</div>
+      </div>
+      <div class="stat-box">
+        <div class="num" id="skippedCount">-</div>
+        <div class="lbl">Skipped</div>
+      </div>
+    </div>
+
+    <a href="#" class="action-btn secondary">View Detailed Solutions</a>
+    <a href="chapters.html" class="action-btn primary">Back to Chapters</a>
+    <a href="index.html" class="action-btn gold">Go to Home</a>
+  </div>
+</div>
+
+<script>
+  const score = parseInt(localStorage.getItem('nw_lastScore') || 0);
+  const total = parseInt(localStorage.getItem('nw_lastTotal') || 15);
+  const answers = JSON.parse(localStorage.getItem('nw_lastAnswers') || '[]');
+  const skipped = answers.filter(a => a === null || a === undefined).length;
+  const wrong = total - score - skipped;
+  const percent = Math.round((score / total) * 100);
+
+  document.getElementById('scoreDisplay').textContent = `${score}/${total}`;
+  document.getElementById('scoreSub').textContent = `Pair of Linear Equations · Mathematics · ${percent}% accuracy`;
+  document.getElementById('correctCount').textContent = score;
+  document.getElementById('wrongCount').textContent = wrong;
+  document.getElementById('skippedCount').textContent = skipped;
+
+  const badge = document.getElementById('passBadge');
+  if (percent >= 60){
+    badge.textContent = '✓ PASSED';
+    badge.classList.add('pass');
+  } else {
+    badge.textContent = '✗ NOT PASSED — TRY AGAIN';
+    badge.classList.add('fail');
+  }
+</script>
+
+</body>
+</html>
