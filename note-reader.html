@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Notes Wallah — Real Numbers</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --navy:#132242; --navy-light:#1D3560; --gold:#E8A33D; --gold-light:#F6D9A6;
+    --cream:#F7F5F0; --ink:#1B1B1B; --grey:#6B7280; --green:#2E8B57;
+    --radius:16px; --shadow: 0 4px 16px rgba(19,34,66,0.08);
+  }
+  *{box-sizing:border-box; margin:0; padding:0;}
+  body{ font-family:'Inter', sans-serif; background:var(--cream); color:var(--ink); display:flex; justify-content:center; }
+  .phone{ width:100%; max-width:430px; min-height:100vh; background:var(--cream); padding-bottom:90px; }
+  h1,h2,h3,.display{ font-family:'Fraunces', serif; }
+
+  .topbar{
+    background:var(--navy); color:white; padding:16px 16px 16px;
+    border-radius:0 0 24px 24px; display:flex; align-items:center; gap:12px; justify-content:space-between;
+  }
+  .topbar-left{ display:flex; align-items:center; gap:12px; }
+  .back-btn, .icon-btn{
+    width:36px; height:36px; border-radius:50%; background:rgba(255,255,255,0.1);
+    display:flex; align-items:center; justify-content:center; font-size:16px; cursor:pointer; text-decoration:none; color:white; flex-shrink:0;
+  }
+  .icon-btn.active{ background:var(--gold); color:var(--navy); }
+  .topbar h1{ font-size:16.5px; font-weight:600; }
+  .topbar p{ font-size:11.5px; color:var(--gold-light); margin-top:2px; }
+  .topbar-icons{ display:flex; gap:8px; }
+
+  .toolbar{
+    display:flex; justify-content:space-between; align-items:center;
+    padding:12px 18px; background:white; margin:14px 18px 0; border-radius:12px; box-shadow:var(--shadow);
+  }
+  .font-controls{ display:flex; align-items:center; gap:10px; }
+  .font-btn{
+    width:28px; height:28px; border-radius:8px; background:var(--cream);
+    display:flex; align-items:center; justify-content:center; font-size:13px; font-weight:700; cursor:pointer;
+  }
+  .font-label{ font-size:11px; color:var(--grey); }
+  .tts-btn{ font-size:11.5px; font-weight:600; color:var(--navy); display:flex; align-items:center; gap:5px; cursor:pointer; }
+
+  .note-body{
+    background:white; margin:14px 18px; padding:20px; border-radius:var(--radius); box-shadow:var(--shadow);
+  }
+  .note-body h2{ font-size:19px; color:var(--navy); margin-bottom:10px; }
+  .note-body h3{ font-size:15px; color:var(--navy); margin:18px 0 8px; font-family:'Inter'; font-weight:700; }
+  .note-body p{ font-size:14.5px; line-height:1.7; color:#333; margin-bottom:10px; }
+  .note-body .example-box{
+    background:var(--cream); border-left:3px solid var(--gold); padding:12px 14px; border-radius:8px; margin:12px 0; font-size:13.5px;
+  }
+  .note-body .example-box strong{ color:var(--navy); }
+
+  .recap-box{
+    margin:14px 18px; background:var(--navy); color:white; padding:18px; border-radius:var(--radius);
+  }
+  .recap-box h3{ font-size:14px; font-family:'Inter'; font-weight:700; color:var(--gold-light); margin-bottom:10px; }
+  .recap-box ul{ padding-left:18px; font-size:13px; line-height:1.8; opacity:0.9; }
+
+  .bottom-actions{
+    margin:16px 18px 0; display:flex; gap:10px;
+  }
+  .action-btn{
+    flex:1; padding:13px; border-radius:12px; text-align:center; font-size:13.5px; font-weight:700; cursor:pointer; border:none;
+  }
+  .action-btn.primary{ background:var(--green); color:white; }
+  .action-btn.secondary{ background:white; color:var(--navy); box-shadow:var(--shadow); }
+
+  .bottom-nav{
+    position:fixed; bottom:0; width:100%; max-width:430px; background:white;
+    border-top:1px solid #EEE; display:flex; justify-content:space-around;
+    padding:10px 0 14px; box-shadow:0 -4px 16px rgba(0,0,0,0.05);
+  }
+  .nav-item{ display:flex; flex-direction:column; align-items:center; gap:3px; font-size:10.5px; font-weight:600; color:var(--grey); text-decoration:none; cursor:pointer; }
+  .nav-item.active{ color:var(--navy); }
+  .nav-icon{ font-size:19px; }
+</style>
+</head>
+<body>
+
+<div class="phone">
+  <div class="topbar">
+    <div class="topbar-left">
+      <a href="chapters.html" class="back-btn">←</a>
+      <div>
+        <h1>Real Numbers</h1>
+        <p>Mathematics · Chapter 1</p>
+      </div>
+    </div>
+    <div class="topbar-icons">
+      <div class="icon-btn active">🔖</div>
+    </div>
+  </div>
+
+  <div class="toolbar">
+    <div class="font-controls">
+      <div class="font-btn">A-</div>
+      <div class="font-label">Font size</div>
+      <div class="font-btn">A+</div>
+    </div>
+    <div class="tts-btn">🔊 Listen</div>
+  </div>
+
+  <div class="note-body">
+    <h2>1. Introduction to Real Numbers</h2>
+    <p>Real numbers are the set of all rational and irrational numbers. Every point on the number line represents a unique real number, and every real number corresponds to a unique point on the number line. This chapter builds on your understanding of number systems from earlier classes and introduces powerful tools like Euclid's Division Lemma and the Fundamental Theorem of Arithmetic.</p>
+
+    <h3>Euclid's Division Lemma</h3>
+    <p>For any two positive integers a and b, there exist unique whole numbers q and r such that a = bq + r, where 0 ≤ r &lt; b. This is the mathematical way of expressing the long division process you've used since primary school — 'a' is the dividend, 'b' is the divisor, 'q' is the quotient, and 'r' is the remainder.</p>
+    <div class="example-box">
+      <strong>Example:</strong> Find the HCF of 135 and 225 using Euclid's algorithm.<br>
+      225 = 135 × 1 + 90<br>
+      135 = 90 × 1 + 45<br>
+      90 = 45 × 2 + 0<br>
+      Since remainder is 0, HCF = 45.
+    </div>
+
+    <h3>Fundamental Theorem of Arithmetic</h3>
+    <p>Every composite number can be expressed (factorised) as a product of primes, and this factorisation is unique, apart from the order in which the prime factors occur. This is why prime numbers are called the "building blocks" of all numbers.</p>
+    <div class="example-box">
+      <strong>Example:</strong> 140 = 2 × 2 × 5 × 7 = 2² × 5 × 7. No matter how you factor 140, you always end up with the same set of prime factors.
+    </div>
+
+    <h3>Revisiting Irrational Numbers</h3>
+    <p>A number is irrational if it cannot be written in the form p/q, where p and q are integers and q ≠ 0. Numbers like √2, √3, √5, and π are irrational. You can prove a number like √2 is irrational using a method called "proof by contradiction" — assuming it IS rational, and showing that this assumption leads to a logical contradiction.</p>
+  </div>
+
+  <div class="recap-box">
+    <h3>QUICK RECAP</h3>
+    <ul>
+      <li>Euclid's Lemma: a = bq + r, 0 ≤ r &lt; b</li>
+      <li>HCF can be found using repeated division (Euclid's algorithm)</li>
+      <li>Every composite number = unique product of primes</li>
+      <li>√2, √3, √5, π are irrational numbers</li>
+    </ul>
+  </div>
+
+  <div class="bottom-actions">
+    <button class="action-btn secondary">📄 Hand-Written Notes</button>
+    <button class="action-btn primary">✓ Mark as Read</button>
+  </div>
+</div>
+
+<div class="bottom-nav">
+  <a href="index.html" class="nav-item"><div class="nav-icon">🏠</div>Home</a>
+  <a href="subjects.html" class="nav-item active"><div class="nav-icon">📚</div>Notes</a>
+  <a href="#" class="nav-item"><div class="nav-icon">📝</div>Test Zone</a>
+  <a href="#" class="nav-item"><div class="nav-icon">💬</div>Doubts</a>
+  <a href="#" class="nav-item"><div class="nav-icon">👤</div>Profile</a>
+</div>
+
+</body>
+</html>
