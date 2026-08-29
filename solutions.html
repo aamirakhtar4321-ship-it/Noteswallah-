@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Notes Wallah — Solutions</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --navy:#132242; --navy-light:#1D3560; --gold:#E8A33D; --gold-light:#F6D9A6;
+    --cream:#F7F5F0; --ink:#1B1B1B; --grey:#6B7280; --green:#2E8B57; --red:#C0392B;
+    --radius:16px; --shadow: 0 4px 16px rgba(19,34,66,0.08);
+  }
+  *{box-sizing:border-box; margin:0; padding:0;}
+  body{ font-family:'Inter', sans-serif; background:var(--cream); color:var(--ink); display:flex; justify-content:center; }
+  .phone{ width:100%; max-width:430px; min-height:100vh; background:var(--cream); padding-bottom:30px; }
+  h1,h2,h3{ font-family:'Fraunces', serif; }
+  .topbar{ background:var(--navy); color:white; padding:16px 20px 20px; border-radius:0 0 24px 24px; display:flex; align-items:center; gap:14px; }
+  .back-btn{ width:36px; height:36px; border-radius:50%; background:rgba(255,255,255,0.1); display:flex; align-items:center; justify-content:center; font-size:16px; cursor:pointer; text-decoration:none; color:white; }
+  .topbar h1{ font-size:18px; font-weight:600; }
+  .topbar p{ font-size:12px; color:var(--gold-light); margin-top:2px; }
+
+  .content{ padding:18px; }
+  .q-block{ background:white; border-radius:14px; box-shadow:var(--shadow); padding:16px; margin-bottom:12px; }
+  .q-header{ display:flex; justify-content:space-between; align-items:center; margin-bottom:10px; }
+  .q-num{ font-size:11.5px; font-weight:700; color:var(--grey); }
+  .result-tag{ font-size:10px; font-weight:700; padding:3px 10px; border-radius:8px; }
+  .result-tag.correct{ background:#E4F3EA; color:var(--green); }
+  .result-tag.wrong{ background:#FBEAE8; color:var(--red); }
+  .result-tag.skipped{ background:#F0EEE8; color:var(--grey); }
+  .q-text{ font-size:13.5px; font-weight:600; margin-bottom:10px; line-height:1.5; }
+  .opt-line{ display:flex; align-items:center; gap:8px; padding:8px 10px; border-radius:8px; font-size:12.5px; margin-bottom:6px; }
+  .opt-line.your-correct{ background:#E4F3EA; color:#1B5E3A; }
+  .opt-line.your-wrong{ background:#FBEAE8; color:#8C2A20; }
+  .opt-line.correct-answer{ background:#E4F3EA; color:#1B5E3A; }
+  .opt-letter{ width:20px; height:20px; border-radius:50%; background:white; display:flex; align-items:center; justify-content:center; font-size:10px; font-weight:700; flex-shrink:0; }
+  .explanation{ font-size:12px; color:var(--grey); margin-top:8px; padding-top:8px; border-top:1px dashed #E3E1DB; line-height:1.5; }
+  .explanation b{ color:var(--navy); }
+</style>
+</head>
+<body>
+
+<div class="phone">
+  <div class="topbar">
+    <a href="result.html" class="back-btn">←</a>
+    <div>
+      <h1>Detailed Solutions</h1>
+      <p>Pair of Linear Equations · Mathematics</p>
+    </div>
+  </div>
+
+  <div class="content" id="solutionsArea"></div>
+</div>
+
+<script>
+  const questions = [
+    {q:"Which of the following is a linear equation in two variables?", options:["x² + y = 5","2x + 3y = 7","xy = 10","x + y² = 4"], correct:1, exp:"A linear equation in two variables has both variables raised to the power 1 only, with no products or higher powers — only option B fits this form."},
+    {q:"The pair of equations x=2 and y=3 represents lines that are:", options:["Parallel","Intersecting at (2,3)","Coincident","Perpendicular only"], correct:1, exp:"x=2 is a vertical line and y=3 is a horizontal line — they always intersect at exactly one point, (2,3)."},
+    {q:"For a pair of linear equations to have a unique solution, the lines must be:", options:["Parallel","Coincident","Intersecting","None of these"], correct:2, exp:"Intersecting lines meet at exactly one point, giving a unique solution — this happens when a₁/a₂ ≠ b₁/b₂."},
+    {q:"If a₁/a₂ = b₁/b₂ = c₁/c₂, the pair of equations has:", options:["No solution","Unique solution","Infinitely many solutions","Cannot be determined"], correct:2, exp:"When all three ratios are equal, the two equations represent the same line (coincident), giving infinitely many common solutions."},
+    {q:"The graphical method of solving equations uses which type of representation?", options:["Bar graph","Straight lines","Pie chart","Histogram"], correct:1, exp:"Linear equations are represented as straight lines on a graph; their intersection point (if any) is the solution."},
+    {q:"Which method involves substituting one variable's value into the other equation?", options:["Elimination method","Substitution method","Cross-multiplication","Graphical method"], correct:1, exp:"The substitution method solves one equation for one variable, then substitutes that expression into the other equation."},
+    {q:"If two lines are parallel, the pair of equations has:", options:["Unique solution","No solution","Infinite solutions","Two solutions"], correct:1, exp:"Parallel lines never meet, so there is no common point — meaning no solution exists (a₁/a₂ = b₁/b₂ ≠ c₁/c₂)."},
+    {q:"2x + y = 5 and 3x + 2y = 8 — solving gives x = ?", options:["1","2","3","0"], correct:1, exp:"From eq1: y = 5-2x. Substituting into eq2: 3x + 2(5-2x) = 8 → 3x+10-4x=8 → -x=-2 → x=2."},
+    {q:"The condition a₁/a₂ ≠ b₁/b₂ indicates the equations are:", options:["Consistent with unique solution","Inconsistent","Dependent","Coincident"], correct:0, exp:"This condition means the lines intersect at exactly one point — a consistent system with a unique solution."},
+    {q:"Coincident lines represent equations that are:", options:["Independent","Dependent and consistent","Inconsistent","Perpendicular"], correct:1, exp:"Coincident lines are essentially the same line — they are dependent (one is a multiple of the other) and consistent (they share infinite solutions)."},
+    {q:"In the elimination method, we aim to:", options:["Graph both lines","Eliminate one variable by adding/subtracting equations","Multiply variables","Divide the equations"], correct:1, exp:"The elimination method makes the coefficients of one variable equal (or opposite) in both equations, then adds or subtracts to eliminate that variable."},
+    {q:"How many solutions does an inconsistent pair of equations have?", options:["One","Two","Infinite","None"], correct:3, exp:"An inconsistent pair represents parallel lines that never intersect, so there are zero common solutions."},
+    {q:"The equations 2x+3y=9 and 4x+6y=18 are:", options:["Inconsistent","Coincident (infinite solutions)","Intersecting","Perpendicular"], correct:1, exp:"The second equation is exactly double the first (2×2x+3y=9 → 4x+6y=18), so they represent the same line — coincident, infinite solutions."},
+    {q:"Cross-multiplication method is used to find:", options:["Only x","Only y","Both x and y directly","Neither"], correct:2, exp:"The cross-multiplication method gives a direct formula that solves for both x and y simultaneously using the coefficients."},
+    {q:"A pair of linear equations in two variables can be represented graphically as:", options:["Curves","Two lines","Circles","Parabolas"], correct:1, exp:"Since each equation is linear (degree 1), each is represented by a straight line on the graph — hence 'two lines'."}
+  ];
+
+  const answers = JSON.parse(localStorage.getItem('nw_lastAnswers') || '[]');
+  const area = document.getElementById('solutionsArea');
+
+  questions.forEach((q, i) => {
+    const userAns = answers[i];
+    let tagClass = 'skipped', tagText = 'Skipped';
+    if (userAns !== null && userAns !== undefined) {
+      if (userAns === q.correct) { tagClass = 'correct'; tagText = 'Correct'; }
+      else { tagClass = 'wrong'; tagText = 'Incorrect'; }
+    }
+
+    let optionsHtml = '';
+    q.options.forEach((opt, oi) => {
+      let cls = '';
+      if (oi === q.correct) cls = 'correct-answer';
+      if (userAns === oi && oi !== q.correct) cls = 'your-wrong';
+      optionsHtml += `<div class="opt-line ${cls}"><div class="opt-letter">${String.fromCharCode(65+oi)}</div><div>${opt}${oi===q.correct ? ' ✓' : ''}${userAns===oi && oi!==q.correct ? ' (your answer)' : ''}</div></div>`;
+    });
+
+    const block = document.createElement('div');
+    block.className = 'q-block';
+    block.innerHTML = `
+      <div class="q-header">
+        <div class="q-num">Question ${i+1}</div>
+        <div class="result-tag ${tagClass}">${tagText}</div>
+      </div>
+      <div class="q-text">${q.q}</div>
+      ${optionsHtml}
+      <div class="explanation"><b>Explanation:</b> ${q.exp}</div>
+    `;
+    area.appendChild(block);
+  });
+</script>
+
+</body>
+</html>
