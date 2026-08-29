@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Notes Wallah — Certificate</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,700&family=Inter:wght@400;500;600;700&family=Playfair+Display:ital@1&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --navy:#132242; --navy-light:#1D3560; --gold:#E8A33D; --gold-light:#F6D9A6;
+    --cream:#F7F5F0; --ink:#1B1B1B; --grey:#6B7280; --green:#2E8B57;
+    --radius:16px; --shadow: 0 4px 16px rgba(19,34,66,0.08);
+  }
+  *{box-sizing:border-box; margin:0; padding:0;}
+  body{ font-family:'Inter', sans-serif; background:var(--cream); color:var(--ink); display:flex; justify-content:center; }
+  .phone{ width:100%; max-width:430px; min-height:100vh; background:var(--cream); padding-bottom:40px; }
+  h1,h2,h3{ font-family:'Fraunces', serif; }
+
+  .topbar{
+    background:var(--navy); color:white; padding:16px 20px 20px;
+    border-radius:0 0 24px 24px; display:flex; align-items:center; gap:14px;
+  }
+  .back-btn{ width:36px; height:36px; border-radius:50%; background:rgba(255,255,255,0.1); display:flex; align-items:center; justify-content:center; font-size:16px; cursor:pointer; text-decoration:none; color:white; }
+  .topbar h1{ font-size:18px; font-weight:600; }
+
+  .content{ padding:20px; }
+
+  .cert-frame{
+    background:white; border-radius:14px; padding:8px; box-shadow:var(--shadow);
+  }
+  .cert-inner{
+    border:2.5px solid var(--gold);
+    border-radius:8px;
+    padding:26px 20px;
+    text-align:center;
+    position:relative;
+    background:
+      radial-gradient(circle at top left, rgba(232,163,61,0.08), transparent 60%),
+      radial-gradient(circle at bottom right, rgba(19,34,66,0.06), transparent 60%);
+  }
+  .cert-corner{
+    position:absolute; width:22px; height:22px; border:2px solid var(--gold);
+  }
+  .cert-corner.tl{ top:6px; left:6px; border-right:none; border-bottom:none; }
+  .cert-corner.tr{ top:6px; right:6px; border-left:none; border-bottom:none; }
+  .cert-corner.bl{ bottom:6px; left:6px; border-right:none; border-top:none; }
+  .cert-corner.br{ bottom:6px; right:6px; border-left:none; border-top:none; }
+
+  .cert-logo{ font-family:'Fraunces'; font-weight:700; font-size:15px; color:var(--navy); letter-spacing:0.4px; }
+  .cert-logo span{ color:var(--gold); }
+  .cert-seal{ font-size:26px; margin:10px 0 6px; }
+  .cert-title{ font-size:12px; letter-spacing:1.6px; text-transform:uppercase; color:var(--grey); margin-top:4px; }
+  .cert-subtitle{ font-family:'Fraunces'; font-size:19px; color:var(--navy); margin-top:2px; }
+
+  .cert-presented{ font-size:11px; color:var(--grey); margin-top:18px; }
+  .cert-name{
+    font-family:'Playfair Display', serif; font-style:italic; font-size:26px;
+    color:var(--navy); margin:8px 0; border-bottom:1.5px solid var(--gold-light); display:inline-block; padding-bottom:6px;
+  }
+  .cert-desc{ font-size:11.5px; color:#444; line-height:1.6; margin-top:14px; padding:0 6px; }
+  .cert-desc b{ color:var(--navy); }
+
+  .cert-grade{
+    display:inline-block; margin-top:14px; background:var(--gold); color:var(--navy);
+    padding:6px 18px; border-radius:20px; font-size:11.5px; font-weight:700; letter-spacing:0.4px;
+  }
+
+  .cert-footer{ display:flex; justify-content:space-between; align-items:flex-end; margin-top:24px; padding:0 4px; }
+  .cert-date{ text-align:left; }
+  .cert-date .lbl{ font-size:9px; color:var(--grey); text-transform:uppercase; letter-spacing:0.5px; }
+  .cert-date .val{ font-size:11.5px; font-weight:600; color:var(--navy); margin-top:2px; }
+  .cert-sign{ text-align:right; }
+  .cert-sign .sig{ font-family:'Playfair Display', serif; font-style:italic; font-size:15px; color:var(--navy); }
+  .cert-sign .role{ font-size:9px; color:var(--grey); margin-top:2px; }
+
+  .cert-id{ text-align:center; font-size:8.5px; color:#B0AEA6; margin-top:16px; letter-spacing:0.5px; }
+
+  .action-row{ display:flex; gap:10px; margin-top:20px; }
+  .action-btn{
+    flex:1; padding:14px; border-radius:14px; font-size:13.5px; font-weight:700;
+    border:none; cursor:pointer; text-align:center;
+  }
+  .action-btn.primary{ background:var(--navy); color:white; }
+  .action-btn.secondary{ background:white; color:var(--navy); box-shadow:var(--shadow); }
+
+  .note-box{
+    background:white; border-radius:12px; padding:12px 14px; margin-top:14px;
+    font-size:11px; color:var(--grey); box-shadow:var(--shadow); line-height:1.5;
+  }
+</style>
+</head>
+<body>
+
+<div class="phone">
+  <div class="topbar">
+    <a href="result.html" class="back-btn">←</a>
+    <h1>Your Certificate</h1>
+  </div>
+
+  <div class="content">
+    <div class="cert-frame">
+      <div class="cert-inner">
+        <div class="cert-corner tl"></div>
+        <div class="cert-corner tr"></div>
+        <div class="cert-corner bl"></div>
+        <div class="cert-corner br"></div>
+
+        <div class="cert-logo">Notes<span>Wallah</span></div>
+        <div class="cert-seal">🏅</div>
+        <div class="cert-title">Certificate of Achievement</div>
+        <div class="cert-subtitle">Pair of Linear Equations</div>
+
+        <div class="cert-presented">This certifies that</div>
+        <div class="cert-name">Aman Kumar</div>
+        <div class="cert-desc">
+          has successfully completed the <b>Pair of Linear Equations in Two Variables</b>
+          chapter test in Mathematics, Class 10, scoring <b>13/15 (87%)</b>.
+        </div>
+
+        <div class="cert-grade">★ Very Good</div>
+
+        <div class="cert-footer">
+          <div class="cert-date">
+            <div class="lbl">Date</div>
+            <div class="val" id="certDate">29 Aug 2026</div>
+          </div>
+          <div class="cert-sign">
+            <div class="sig">Notes Wallah</div>
+            <div class="role">Issuing Authority</div>
+          </div>
+        </div>
+
+        <div class="cert-id">Certificate ID: NW-MATH03-AK2026-08291402</div>
+      </div>
+    </div>
+
+    <div class="action-row">
+      <button class="action-btn secondary" onclick="alert('High-resolution download requires a backend image renderer — coming in a future update. For now you can screenshot this certificate.')">⬇ Download</button>
+      <button class="action-btn primary" onclick="alert('Share sheet will open here once connected to the device share API.')">↗ Share</button>
+    </div>
+
+    <div class="note-box">
+      This is a visual preview of the certificate design. True 4K PNG/PDF export and QR-code verification require a backend (see project roadmap) — for now the layout and content are final and ready to be wired up.
+    </div>
+  </div>
+</div>
+
+</body>
+</html>
