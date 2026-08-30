@@ -22,7 +22,7 @@
     position:fixed; inset:0; z-index:9999;
     background:linear-gradient(160deg,var(--navy),#0B1730);
     display:flex; flex-direction:column; align-items:center; justify-content:center;
-    animation:splashExit .7s ease forwards; animation-delay:2.6s;
+    animation:splashExit .5s ease forwards; animation-delay:1.3s;
   }
   .splash-glow{
     position:absolute; width:260px; height:260px; border-radius:50%;
@@ -47,7 +47,7 @@
   }
   .splash-line::after{
     content:""; position:absolute; left:-100%; top:0; width:100%; height:100%;
-    background:var(--gold); animation:loadingBar 1.9s ease forwards; animation-delay:.7s;
+    background:var(--gold); animation:loadingBar 1s ease forwards; animation-delay:.5s;
   }
   @keyframes logoIn{ 0%{opacity:0; transform:translateY(30px) scale(.7) rotate(-6deg);} 60%{opacity:1; transform:translateY(-4px) scale(1.05) rotate(2deg);} 100%{opacity:1; transform:translateY(0) scale(1) rotate(0);} }
   @keyframes nameIn{ from{opacity:0; transform:translateY(10px); letter-spacing:8px;} to{opacity:1; transform:translateY(0); letter-spacing:4px;} }
@@ -203,6 +203,9 @@
       <a href="doubts.html" class="quick-item" style="text-decoration:none; color:inherit; display:block;">
         <div class="qi-icon">💬</div><div class="qi-label">Ask Sara</div>
       </a>
+      <div class="quick-item" onclick="alert('E-books — coming soon after app publish!')">
+        <div class="qi-icon">📖</div><div class="qi-label">E-Books</div>
+      </div>
     </div>
 
     <!-- CHALLENGES — smaller, side by side -->
@@ -266,6 +269,8 @@
   <a href="profile.html" class="nav-item"><div class="nav-icon">👤</div>Profile</a>
 </div>
 
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="supabase-config.js"></script>
 <script>
   if (sessionStorage.getItem('nw_splash_shown')) {
     document.getElementById('splash').style.display = 'none';
@@ -277,6 +282,11 @@
   if (hour >= 12 && hour < 17) greet = "Good afternoon";
   else if (hour >= 17) greet = "Good evening";
   document.getElementById('greetText').textContent = greet + ", Aman";
+
+  (async () => {
+    const { data: { session } } = await supabaseClient.auth.getSession();
+    if (!session) { window.location.href = "login.html"; }
+  })();
 </script>
 
 </body>
