@@ -90,9 +90,17 @@
       <a href="#" class="menu-item"><div class="menu-icon">☁️</div><div class="menu-label">Backup — Last synced just now</div><div class="menu-chevron">›</div></a>
     </div>
 
-    <button class="logout-btn">Log Out</button>
+    <button class="logout-btn" onclick="doLogout()">Log Out</button>
   </div>
 </div>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="supabase-config.js"></script>
+<script>
+  async function doLogout(){
+    await supabaseClient.auth.signOut();
+    window.location.href = "login.html";
+  }
+</script>
 
 <div class="bottom-nav">
   <a href="index.html" class="nav-item"><div class="nav-icon">🏠</div>Home</a>
