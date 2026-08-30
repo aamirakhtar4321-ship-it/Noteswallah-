@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Notes Wallah — Study Alarm</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{ --navy:#132242; --gold:#E8A33D; --cream:#F7F5F0; --grey:#6B7280; --green:#2E8B57; --shadow:0 4px 16px rgba(19,34,66,0.08); }
+  *{box-sizing:border-box; margin:0; padding:0;}
+  body{ font-family:'Inter',sans-serif; background:var(--cream); display:flex; justify-content:center; }
+  .phone{ width:100%; max-width:430px; min-height:100vh; padding-bottom:40px; }
+  .topbar{ background:var(--navy); color:white; padding:16px 20px 20px; border-radius:0 0 24px 24px; display:flex; align-items:center; gap:14px; }
+  .back-btn{ width:36px; height:36px; border-radius:50%; background:rgba(255,255,255,0.1); display:flex; align-items:center; justify-content:center; font-size:16px; cursor:pointer; text-decoration:none; color:white; }
+  .topbar h1{ font-family:'Fraunces',serif; font-size:18px; }
+  .content{ padding:20px; }
+  .set-card{ background:white; border-radius:16px; box-shadow:var(--shadow); padding:22px; text-align:center; }
+  input[type="time"]{ font-size:28px; font-family:'Fraunces'; color:var(--navy); border:none; background:transparent; text-align:center; width:100%; }
+  label{ font-size:12px; color:var(--grey); font-weight:600; }
+  .set-btn{ width:100%; background:var(--navy); color:white; border:none; padding:14px; border-radius:14px; font-weight:700; font-size:14px; margin-top:16px; cursor:pointer; }
+  .active-alarm{ background:white; border-radius:16px; box-shadow:var(--shadow); padding:18px; margin-top:16px; display:none; align-items:center; justify-content:space-between; }
+  .active-alarm.show{ display:flex; }
+  .alarm-time{ font-family:'Fraunces'; font-size:20px; color:var(--navy); }
+  .alarm-status{ font-size:11px; color:var(--green); font-weight:600; }
+  .cancel-btn{ background:#FBEAE8; color:#C0392B; border:none; padding:8px 14px; border-radius:10px; font-weight:700; font-size:12px; cursor:pointer; }
+  .note-box{ background:white; border-radius:12px; padding:14px; margin-top:16px; font-size:11.5px; color:var(--grey); line-height:1.6; box-shadow:var(--shadow); }
+</style>
+</head>
+<body>
+<div class="phone">
+  <div class="topbar">
+    <a href="index.html" class="back-btn">←</a>
+    <h1>Study Alarm</h1>
+  </div>
+  <div class="content">
+    <div class="set-card">
+      <label>SET YOUR STUDY TIME</label>
+      <input type="time" id="alarmTime" value="18:00">
+      <button class="set-btn" onclick="setAlarm()">Set Alarm</button>
+    </div>
+
+    <div class="active-alarm" id="activeAlarm">
+      <div>
+        <div class="alarm-time" id="activeTime">6:00 PM</div>
+        <div class="alarm-status">● Active — keep this tab open</div>
+      </div>
+      <button class="cancel-btn" onclick="cancelAlarm()">Cancel</button>
+    </div>
+
+    <div class="note-box">
+      This browser-based alarm works while Notes Wallah is open in your browser tab and will show a notification + sound at your set time. A true background alarm (that works even when the app is fully closed) will be available once the app is published as a native Play Store app in a later part.
+    </div>
+  </div>
+</div>
+
+<script>
+  let alarmTimeout = null;
+
+  function setAlarm(){
+    const timeVal = document.getElementById('alarmTime').value;
+    if(!timeVal) return;
+    if (Notification && Notification.permission !== 'granted') Notification.requestPermission();
+
+    const [h, m] = timeVal.split(':').map(Number);
+    const now = new Date();
+    let target = new Date(now.getFullYear(), now.getMonth(), now.getDate(), h, m, 0);
+    if (target < now) target.setDate(target.getDate() + 1);
+    const msUntil = target - now;
+
+    if (alarmTimeout) clearTimeout(alarmTimeout);
+    alarmTimeout = setTimeout(() => {
+      try {
+        if (Notification && Notification.permission === 'granted') {
+          new Notification('⏰ Study Time!', { body: 'Time to open Notes Wallah and study.' });
+        }
+      } catch(e){}
+      alert('⏰ Study Time! It\'s time to study.');
+    }, msUntil);
+
+    const displayTime = target.toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'});
+    document.getElementById('activeTime').textContent = displayTime;
+    document.getElementById('activeAlarm').classList.add('show');
+  }
+
+  function cancelAlarm(){
+    if (alarmTimeout) clearTimeout(alarmTimeout);
+    document.getElementById('activeAlarm').classList.remove('show');
+  }
+</script>
+</body>
+</html>
