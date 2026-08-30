@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Notes Wallah — Onboarding</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="supabase-config.js"></script>
+<style>
+  :root{ --navy:#132242; --gold:#E8A33D; --cream:#F7F5F0; --grey:#6B7280; --shadow:0 4px 16px rgba(19,34,66,0.08); }
+  *{box-sizing:border-box; margin:0; padding:0;}
+  body{ font-family:'Inter',sans-serif; background:var(--cream); display:flex; justify-content:center; }
+  .phone{ width:100%; max-width:430px; min-height:100vh; padding:30px 22px; }
+  h1{ font-family:'Fraunces',serif; color:var(--navy); font-size:20px; margin-bottom:6px; }
+  .sub{ color:var(--grey); font-size:13px; margin-bottom:20px; }
+  .opt-grid{ display:grid; grid-template-columns:1fr; gap:10px; margin-bottom:20px; }
+  .opt-card{ background:white; border:2px solid #E3E1DB; border-radius:14px; padding:14px; font-weight:600; font-size:14px; color:var(--navy); cursor:pointer; box-shadow:var(--shadow); }
+  .opt-card.selected{ border-color:var(--gold); background:#FFF8EC; }
+  select{ width:100%; padding:13px 14px; border-radius:12px; border:1.5px solid #E3E1DB; font-size:14px; font-family:'Inter'; margin-top:10px; background:white; }
+  .btn{ width:100%; background:var(--navy); color:white; border:none; padding:14px; border-radius:14px; font-weight:700; font-size:14px; margin-top:16px; cursor:pointer; }
+  .btn:disabled{ opacity:0.5; }
+  #step2{ display:none; }
+</style>
+</head>
+<body>
+<div class="phone">
+  <div id="step1">
+    <h1>What are you preparing for?</h1>
+    <p class="sub">This helps us show you the right content</p>
+    <div class="opt-grid">
+      <div class="opt-card" onclick="selectType('school', this)">🏫 School (Class 1–12)</div>
+      <div class="opt-card" onclick="selectType('competitive', this)">🎯 Competitive Exam</div>
+      <div class="opt-card" onclick="selectType('university_entrance', this)">🎓 University / Entrance Exam</div>
+    </div>
+  </div>
+
+  <div id="step2">
+    <h1 id="step2Title">Tell us more</h1>
+    <label style="font-size:12.5px; font-weight:600; color:var(--navy);">Class</label>
+    <select id="classSelect">
+      <option value="">Select class</option>
+      <script>for(let i=1;i<=12;i++) document.write(`<option value="${i}">Class ${i}</option>`);</script>
+    </select>
+    <label style="font-size:12.5px; font-weight:600; color:var(--navy); margin-top:12px; display:block;">Board</label>
+    <select id="boardSelect">
+      <option value="CBSE">CBSE</option>
+      <option value="ICSE">ICSE</option>
+      <option value="State Board">State Board</option>
+    </select>
+    <label style="font-size:12.5px; font-weight:600; color:var(--navy); margin-top:12px; display:block;">Medium</label>
+    <select id="mediumSelect">
+      <option value="English">English</option>
+      <option value="Hindi">Hindi</option>
+      <option value="Urdu">Urdu</option>
+    </select>
+    <button class="btn" id="finishBtn" onclick="finishOnboarding()">Continue to Notes Wallah</button>
+  </div>
+</div>
+
+<script>
+  let selectedType = '';
+  function selectType(type, el){
+    selectedType = type;
+    document.querySelectorAll('.opt-card').forEach(c => c.classList.remove('selected'));
+    el.classList.add('selected');
+    document.getElementById('step1').style.display = 'none';
+    document.getElementById('step2').style.display = 'block';
+    document.getElementById('step2Title').textContent =
+      type === 'school' ? 'Your school details' :
+      type === 'competitive' ? 'Which exam?' : 'Which entrance exam?';
+  }
+
+  async function finishOnboarding(){
+    const btn = document.getElementById('finishBtn');
+    btn.disabled = true; btn.textContent = "Saving...";
+    const { data: { user } } = await supabaseClient.auth.getUser();
+    if(!user){ window.location.href = "login.html"; return; }
+
+    await supabaseClient.from('profiles').update({
+      exam_type: selectedType,
+      class_selected: document.getElementById('classSelect').value,
+      board: document.getElementById('boardSelect').value,
+      medium: document.getElementById('mediumSelect').value
+    }).eq('id', user.id);
+
+    window.location.href = "index.html";
+  }
+</script>
+</body>
+</html>
