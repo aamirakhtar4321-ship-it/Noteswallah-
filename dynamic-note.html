@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Notes Wallah — Note</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="supabase-config.js"></script>
+<style>
+  :root{ --navy:#132242; --gold:#E8A33D; --gold-light:#F6D9A6; --cream:#F7F5F0; --ink:#1B1B1B; --grey:#6B7280; --green:#2E8B57; --radius:16px; --shadow:0 4px 16px rgba(19,34,66,0.08); }
+  *{box-sizing:border-box; margin:0; padding:0;}
+  body{ font-family:'Inter',sans-serif; background:var(--cream); color:var(--ink); display:flex; justify-content:center; }
+  .phone{ width:100%; max-width:430px; min-height:100vh; background:var(--cream); padding-bottom:90px; }
+  h1,h2{ font-family:'Fraunces',serif; }
+  .topbar{ background:var(--navy); color:white; padding:16px; border-radius:0 0 24px 24px; display:flex; align-items:center; gap:12px; }
+  .back-btn{ width:36px; height:36px; border-radius:50%; background:rgba(255,255,255,0.1); display:flex; align-items:center; justify-content:center; font-size:16px; cursor:pointer; text-decoration:none; color:white; }
+  .topbar h1{ font-size:16.5px; font-weight:600; }
+  .note-body{ background:white; margin:14px 18px; padding:20px; border-radius:var(--radius); box-shadow:var(--shadow); }
+  .note-body p{ font-size:14.5px; line-height:1.75; color:#333; white-space:pre-wrap; }
+  .empty{ text-align:center; padding:50px 20px; color:var(--grey); font-size:13px; }
+  .pro-card{ margin:14px 18px; background:white; border-radius:var(--radius); box-shadow:var(--shadow); padding:16px; display:flex; align-items:center; gap:12px; }
+  .pro-icon{ width:44px; height:44px; border-radius:12px; background:var(--cream); display:flex; align-items:center; justify-content:center; font-size:20px; }
+  .pro-info{ flex:1; }
+  .pro-info h4{ font-size:13.5px; font-weight:600; }
+  .pro-info p{ font-size:11px; color:var(--grey); margin-top:2px; }
+  .pro-btn{ background:var(--navy); color:white; border:none; padding:9px 14px; border-radius:10px; font-size:11.5px; font-weight:700; cursor:pointer; white-space:nowrap; text-decoration:none; }
+</style>
+</head>
+<body>
+<div class="phone">
+  <div class="topbar">
+    <a href="javascript:history.back()" class="back-btn">←</a>
+    <h1 id="chapterTitle">Loading...</h1>
+  </div>
+  <div class="note-body" id="noteContent"><p>Loading note content...</p></div>
+  <div id="proNoteArea"></div>
+</div>
+
+<script>
+  const params = new URLSearchParams(window.location.search);
+  const chapterId = params.get('chapter_id');
+
+  (async () => {
+    if (!chapterId) return;
+    const { data: chapter } = await supabaseClient.from('chapters').select('*').eq('id', chapterId).single();
+    if (chapter) document.getElementById('chapterTitle').textContent = chapter.title;
+
+    const { data: note } = await supabaseClient.from('notes').select('*').eq('chapter_id', chapterId).eq('language', 'en').single();
+    const noteDiv = document.getElementById('noteContent');
+    noteDiv.innerHTML = note && note.content ? `<p>${note.content}</p>` : '<div class="empty">No notes added yet for this chapter. Check back soon!</div>';
+
+    const { data: proNotes } = await supabaseClient.from('professional_notes').select('*').eq('chapter_id', chapterId);
+    const proArea = document.getElementById('proNoteArea');
+    if (proNotes && proNotes.length > 0) {
+      const { data: { session } } = await supabaseClient.auth.getSession();
+      for (const pn of proNotes) {
+        let unlocked = false;
+        if (session) {
+          const { data: unlock } = await supabaseClient.from('user_unlocked_notes').select('*').eq('user_id', session.user.id).eq('professional_note_id', pn.id).maybeSingle();
+          unlocked = !!unlock;
+        }
+        const card = document.createElement('div');
+        card.className = 'pro-card';
+        if (unlocked) {
+          card.innerHTML = `<div class="pro-icon">📄</div><div class="pro-info"><h4>${pn.title}</h4><p>${pn.page_count || '?'} pages · Unlocked</p></div><a href="${pn.pdf_url}" target="_blank" class="pro-btn">Open PDF</a>`;
+        } else {
+          card.innerHTML = `<div class="pro-icon">🔒</div><div class="pro-info"><h4>${pn.title}</h4><p>${pn.page_count || '?'} pages · ${pn.xp_cost} XP to unlock</p></div><button class="pro-btn" onclick="unlockNote(${pn.id}, ${pn.xp_cost})">Unlock</button>`;
+        }
+        proArea.appendChild(card);
+      }
+    }
+  })();
+
+  async function unlockNote(noteId, cost){
+    const { data: { session } } = await supabaseClient.auth.getSession();
+    if (!session) { window.location.href = "login.html"; return; }
+    const { data: profile } = await supabaseClient.from('profiles').select('total_xp').eq('id', session.user.id).single();
+    if (!profile || profile.total_xp < cost) {
+      alert(`You need ${cost} XP to unlock this. Complete Daily/Weekly Challenges to earn more.`);
+      return;
+    }
+    await supabaseClient.from('profiles').update({ total_xp: profile.total_xp - cost }).eq('id', session.user.id);
+    await supabaseClient.from('xp_transactions').insert({ user_id: session.user.id, amount: -cost, type: 'spent_unlock_note' });
+    await supabaseClient.from('user_unlocked_notes').insert({ user_id: session.user.id, professional_note_id: noteId });
+    location.reload();
+  }
+</script>
+</body>
+</html>
