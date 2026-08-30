@@ -57,7 +57,7 @@
   @keyframes splashExit{ to{opacity:0; visibility:hidden; pointer-events:none;} }
 
   /* ===== PAGE FADE-IN ===== */
-  .phone{ animation:pageFadeIn .5s ease .4s both; }
+  .phone{ animation:pageFadeIn .3s ease .05s both; }
   @keyframes pageFadeIn{ from{opacity:0; transform:translateY(8px);} to{opacity:1; transform:translateY(0);} }
 
   /* Top bar */
@@ -168,7 +168,7 @@
     </div>
     <div class="greeting">
       <h1 id="greetText">Good morning, Aman</h1>
-      <p>Class 10 · CBSE · English Medium</p>
+      <p id="classLine">Class 10 · CBSE · English Medium</p>
     </div>
   </div>
 
@@ -285,7 +285,24 @@
 
   (async () => {
     const { data: { session } } = await supabaseClient.auth.getSession();
-    if (!session) { window.location.href = "login.html"; }
+    if (!session) { window.location.href = "login.html"; return; }
+
+    const { data: profile } = await supabaseClient
+      .from('profiles')
+      .select('*')
+      .eq('id', session.user.id)
+      .single();
+
+    if (profile) {
+      const name = profile.name || "Student";
+      document.getElementById('greetText').textContent = greet + ", " + name;
+      document.getElementById('xpAmount').textContent = profile.total_xp || 0;
+      const classLine = document.getElementById('classLine');
+      if (classLine) {
+        classLine.textContent = (profile.class_selected ? "Class " + profile.class_selected + " · " : "") +
+          (profile.board || "") + (profile.medium ? " · " + profile.medium + " Medium" : "");
+      }
+    }
   })();
 </script>
 
