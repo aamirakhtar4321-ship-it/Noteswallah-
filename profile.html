@@ -64,14 +64,14 @@
 
 <div class="phone">
   <div class="topbar">
-    <div class="avatar-big">A</div>
-    <h1>Aman</h1>
-    <p>Class 10 · CBSE · English Medium</p>
+    <div class="avatar-big" id="avatarLetter">A</div>
+    <h1 id="profileName">Loading...</h1>
+    <p id="profileMeta">—</p>
   </div>
 
   <div class="content">
     <div class="stat-grid">
-      <div class="stat-box"><div class="num">140</div><div class="lbl">XP Coins</div></div>
+      <div class="stat-box"><div class="num" id="xpNum">0</div><div class="lbl">XP Coins</div></div>
       <div class="stat-box"><div class="num">6</div><div class="lbl">Day Streak</div></div>
       <div class="stat-box"><div class="num">3</div><div class="lbl">Certificates</div></div>
     </div>
@@ -100,6 +100,20 @@
     await supabaseClient.auth.signOut();
     window.location.href = "login.html";
   }
+
+  (async () => {
+    const { data: { session } } = await supabaseClient.auth.getSession();
+    if (!session) { window.location.href = "login.html"; return; }
+    const { data: profile } = await supabaseClient.from('profiles').select('*').eq('id', session.user.id).single();
+    if (profile) {
+      document.getElementById('profileName').textContent = profile.name || "Student";
+      document.getElementById('avatarLetter').textContent = (profile.name || "S")[0].toUpperCase();
+      document.getElementById('profileMeta').textContent =
+        (profile.class_selected ? "Class " + profile.class_selected + " · " : "") +
+        (profile.board || "") + (profile.medium ? " · " + profile.medium + " Medium" : "");
+      document.getElementById('xpNum').textContent = profile.total_xp || 0;
+    }
+  })();
 </script>
 
 <div class="bottom-nav">
