@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Notes Wallah — Chapters</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="supabase-config.js"></script>
+<style>
+  :root{ --navy:#132242; --gold:#E8A33D; --cream:#F7F5F0; --ink:#1B1B1B; --grey:#6B7280; --green:#2E8B57; --radius:16px; --shadow:0 4px 16px rgba(19,34,66,0.08); }
+  *{box-sizing:border-box; margin:0; padding:0;}
+  body{ font-family:'Inter',sans-serif; background:var(--cream); color:var(--ink); display:flex; justify-content:center; }
+  .phone{ width:100%; max-width:430px; min-height:100vh; background:var(--cream); padding-bottom:90px; }
+  h1{ font-family:'Fraunces',serif; }
+  .topbar{ background:var(--navy); color:white; padding:16px 20px 20px; border-radius:0 0 24px 24px; display:flex; align-items:center; gap:14px; }
+  .back-btn{ width:36px; height:36px; border-radius:50%; background:rgba(255,255,255,0.1); display:flex; align-items:center; justify-content:center; font-size:16px; cursor:pointer; text-decoration:none; color:white; }
+  .topbar h1{ font-size:20px; font-weight:600; }
+  .content{ padding:18px; }
+  .chapter-card{ background:white; border-radius:14px; box-shadow:var(--shadow); padding:14px 16px; display:flex; align-items:center; gap:12px; margin-bottom:10px; text-decoration:none; color:var(--ink); }
+  .ch-num{ width:34px; height:34px; border-radius:10px; background:var(--cream); display:flex; align-items:center; justify-content:center; font-weight:700; font-size:13px; color:var(--navy); flex-shrink:0; }
+  .ch-info h4{ font-size:14.5px; font-weight:600; }
+  .empty{ text-align:center; padding:50px 20px; color:var(--grey); font-size:13px; }
+  .bottom-nav{ position:fixed; bottom:0; width:100%; max-width:430px; background:white; border-top:1px solid #EEE; display:flex; justify-content:space-around; padding:10px 0 14px; }
+  .nav-item{ display:flex; flex-direction:column; align-items:center; gap:3px; font-size:10.5px; font-weight:600; color:var(--grey); text-decoration:none; }
+  .nav-icon{ font-size:19px; }
+</style>
+</head>
+<body>
+<div class="phone">
+  <div class="topbar">
+    <a href="subjects.html" class="back-btn">←</a>
+    <h1 id="subjectTitle">Loading...</h1>
+  </div>
+  <div class="content" id="chapterList"><div class="empty">Loading chapters...</div></div>
+</div>
+<div class="bottom-nav">
+  <a href="index.html" class="nav-item"><div class="nav-icon">🏠</div>Home</a>
+  <a href="subjects.html" class="nav-item"><div class="nav-icon">📚</div>Notes</a>
+  <a href="test-start.html" class="nav-item"><div class="nav-icon">📝</div>Test Zone</a>
+  <a href="doubts.html" class="nav-item"><div class="nav-icon">💬</div>Doubts</a>
+  <a href="profile.html" class="nav-item"><div class="nav-icon">👤</div>Profile</a>
+</div>
+
+<script>
+  const params = new URLSearchParams(window.location.search);
+  const subjectId = params.get('subject_id');
+
+  (async () => {
+    const list = document.getElementById('chapterList');
+    if (!subjectId) { list.innerHTML = '<div class="empty">No subject selected.</div>'; return; }
+
+    const { data: subject } = await supabaseClient.from('subjects').select('*').eq('id', subjectId).single();
+    document.getElementById('subjectTitle').textContent = subject ? subject.name : "Subject";
+
+    const { data: chapters } = await supabaseClient.from('chapters').select('*').eq('subject_id', subjectId).order('order_index');
+
+    if (!chapters || chapters.length === 0) {
+      list.innerHTML = '<div class="empty">No chapters added yet for this subject. Check back soon!</div>';
+      return;
+    }
+
+    list.innerHTML = '';
+    chapters.forEach((ch, i) => {
+      const a = document.createElement('a');
+      a.href = `dynamic-note.html?chapter_id=${ch.id}`;
+      a.className = 'chapter-card';
+      a.innerHTML = `<div class="ch-num">${i+1}</div><div class="ch-info"><h4>${ch.title}</h4></div>`;
+      list.appendChild(a);
+    });
+  })();
+</script>
+</body>
+</html>
