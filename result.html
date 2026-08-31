@@ -81,6 +81,8 @@
   </div>
 </div>
 
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="supabase-config.js"></script>
 <script>
   const score = parseInt(localStorage.getItem('nw_lastScore') || 0);
   const total = parseInt(localStorage.getItem('nw_lastTotal') || 15);
@@ -100,9 +102,32 @@
     badge.textContent = '✓ PASSED';
     badge.classList.add('pass');
     document.getElementById('certBtn').style.display = 'block';
+    awardXP();
   } else {
     badge.textContent = '✗ NOT PASSED — TRY AGAIN';
     badge.classList.add('fail');
+  }
+
+  async function awardXP(){
+    const XP_REWARD = 5;
+    const { data: { session } } = await supabaseClient.auth.getSession();
+    if (!session) return;
+
+    // Prevent re-awarding XP if this exact result was already rewarded this browser session
+    if (sessionStorage.getItem('nw_xp_awarded_this_result')) return;
+    sessionStorage.setItem('nw_xp_awarded_this_result', '1');
+
+    await supabaseClient.from('test_attempts').insert({
+      user_id: session.user.id, chapter_id: 3, score: score, total: total
+    });
+
+    const { data: profile } = await supabaseClient.from('profiles').select('total_xp').eq('id', session.user.id).single();
+    const newXP = (profile?.total_xp || 0) + XP_REWARD;
+    await supabaseClient.from('profiles').update({ total_xp: newXP }).eq('id', session.user.id);
+    await supabaseClient.from('xp_transactions').insert({ user_id: session.user.id, amount: XP_REWARD, type: 'test_pass' });
+
+    const sub = document.getElementById('scoreSub');
+    sub.innerHTML += ` <span style="color:#E8A33D; font-weight:700;">· +${XP_REWARD} XP earned!</span>`;
   }
 </script>
 
