@@ -85,7 +85,7 @@
 
     <div class="menu-card">
       <a href="#" class="menu-item"><div class="menu-icon">🌐</div><div class="menu-label">Language — English</div><div class="menu-chevron">›</div></a>
-      <a href="#" class="menu-item"><div class="menu-icon">🌙</div><div class="menu-label">Dark Mode</div><div class="menu-chevron">›</div></a>
+      <a href="#" class="menu-item" onclick="toggleDark(event)"><div class="menu-icon">🌙</div><div class="menu-label">Dark Mode</div><div class="menu-chevron" id="darkStatus">OFF ›</div></a>
       <a href="#" class="menu-item"><div class="menu-icon">🔔</div><div class="menu-label">Notifications</div><div class="menu-chevron">›</div></a>
       <a href="#" class="menu-item"><div class="menu-icon">☁️</div><div class="menu-label">Backup — Last synced just now</div><div class="menu-chevron">›</div></a>
     </div>
@@ -100,6 +100,14 @@
     await supabaseClient.auth.signOut();
     window.location.href = "login.html";
   }
+  function toggleDark(e){
+    e.preventDefault();
+    const isDark = localStorage.getItem('nw_dark_mode') === '1';
+    localStorage.setItem('nw_dark_mode', isDark ? '0' : '1');
+    document.getElementById('darkStatus').textContent = isDark ? 'OFF ›' : 'ON ›';
+    alert('Dark Mode ' + (isDark ? 'disabled' : 'enabled') + '. It will apply across the app on next page visit (full rollout to every page happens in a later part — Home page already supports it).');
+  }
+  if (localStorage.getItem('nw_dark_mode') === '1') document.getElementById('darkStatus').textContent = 'ON ›';
 
   (async () => {
     const { data: { session } } = await supabaseClient.auth.getSession();
