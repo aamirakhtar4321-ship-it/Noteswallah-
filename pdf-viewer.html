@@ -5,32 +5,57 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Notes Wallah — Viewing</title>
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:wght@700&family=Inter:wght@600;700&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
 <style>
   :root{ --navy:#132242; --gold:#E8A33D; }
   *{box-sizing:border-box; margin:0; padding:0;}
-  body{ font-family:'Inter',sans-serif; }
-  .topbar{ background:var(--navy); color:white; padding:14px 16px; display:flex; align-items:center; gap:12px; }
+  body{ font-family:'Inter',sans-serif; background:#2A2A2A; }
+  .topbar{ background:var(--navy); color:white; padding:14px 16px; display:flex; align-items:center; gap:12px; position:sticky; top:0; z-index:5; }
   .back-btn{ width:34px; height:34px; border-radius:50%; background:rgba(255,255,255,0.1); display:flex; align-items:center; justify-content:center; cursor:pointer; text-decoration:none; color:white; flex-shrink:0; }
-  .topbar h1{ font-size:14.5px; font-weight:700; }
-  .watch-badge{ font-size:10px; background:var(--gold); color:var(--navy); padding:3px 8px; border-radius:8px; font-weight:700; margin-left:auto; }
+  .topbar h1{ font-size:14px; font-weight:700; flex:1; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+  .watch-badge{ font-size:10px; background:var(--gold); color:var(--navy); padding:3px 8px; border-radius:8px; font-weight:700; flex-shrink:0; }
   .ad-banner{ background:#EEE; color:#999; text-align:center; font-size:10.5px; padding:8px; }
-  iframe{ width:100%; height:calc(100vh - 90px); border:none; }
+  #pages{ padding:12px 0; user-select:none; -webkit-user-select:none; }
+  canvas{ display:block; margin:0 auto 10px; max-width:100%; box-shadow:0 4px 14px rgba(0,0,0,0.4); }
+  .loading{ text-align:center; color:white; padding:40px; font-size:13px; }
 </style>
 </head>
-<body>
+<body oncontextmenu="return false;">
   <div class="topbar">
     <a href="javascript:history.back()" class="back-btn">←</a>
     <h1 id="docTitle">Professional Notes</h1>
-    <div class="watch-badge">View Only</div>
+    <div class="watch-badge">🔒 View Only</div>
   </div>
   <div class="ad-banner">📢 Banner Ad Space (AdMob wired in at Play Store phase)</div>
-  <iframe id="pdfFrame" src=""></iframe>
+  <div id="pages"><div class="loading">Loading notes...</div></div>
+
   <script>
+    pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
     const params = new URLSearchParams(window.location.search);
     const url = params.get('url');
     const title = params.get('title');
     if (title) document.getElementById('docTitle').textContent = decodeURIComponent(title);
-    if (url) document.getElementById('pdfFrame').src = url + '#toolbar=0';
+
+    async function renderPdf(){
+      const container = document.getElementById('pages');
+      try {
+        const pdf = await pdfjsLib.getDocument(url).promise;
+        container.innerHTML = '';
+        for (let i = 1; i <= pdf.numPages; i++){
+          const page = await pdf.getPage(i);
+          const viewport = page.getViewport({ scale: 1.6 });
+          const canvas = document.createElement('canvas');
+          canvas.width = viewport.width;
+          canvas.height = viewport.height;
+          const ctx = canvas.getContext('2d');
+          await page.render({ canvasContext: ctx, viewport }).promise;
+          container.appendChild(canvas);
+        }
+      } catch(e) {
+        container.innerHTML = '<div class="loading">Could not load this document.</div>';
+      }
+    }
+    if (url) renderPdf();
   </script>
 </body>
 </html>
