@@ -13,7 +13,8 @@
   .back-btn{ width:34px; height:34px; border-radius:50%; background:rgba(255,255,255,0.1); display:flex; align-items:center; justify-content:center; cursor:pointer; text-decoration:none; color:white; flex-shrink:0; }
   .topbar h1{ font-size:14.5px; font-weight:700; }
   .watch-badge{ font-size:10px; background:var(--gold); color:var(--navy); padding:3px 8px; border-radius:8px; font-weight:700; margin-left:auto; }
-  iframe{ width:100%; height:calc(100vh - 54px); border:none; }
+  .ad-banner{ background:#EEE; color:#999; text-align:center; font-size:10.5px; padding:8px; }
+  iframe{ width:100%; height:calc(100vh - 90px); border:none; }
 </style>
 </head>
 <body>
@@ -22,17 +23,14 @@
     <h1 id="docTitle">Professional Notes</h1>
     <div class="watch-badge">View Only</div>
   </div>
+  <div class="ad-banner">📢 Banner Ad Space (AdMob wired in at Play Store phase)</div>
   <iframe id="pdfFrame" src=""></iframe>
   <script>
     const params = new URLSearchParams(window.location.search);
     const url = params.get('url');
     const title = params.get('title');
     if (title) document.getElementById('docTitle').textContent = decodeURIComponent(title);
-    if (url) {
-      // Google Docs viewer wrapper — renders the PDF as an image-based viewer,
-      // which makes casual right-click/save much harder than opening a raw PDF link.
-      document.getElementById('pdfFrame').src = 'https://docs.google.com/gview?url=' + encodeURIComponent(url) + '&embedded=true';
-    }
+    if (url) document.getElementById('pdfFrame').src = url + '#toolbar=0';
   </script>
 </body>
 </html>
