@@ -140,6 +140,22 @@
   .nav-item{ display:flex; flex-direction:column; align-items:center; gap:3px; font-size:10.5px; font-weight:600; color:var(--grey); cursor:pointer; text-decoration:none; }
   .nav-item.active{ color:var(--navy); }
   .nav-icon{ font-size:19px; }
+  body.dark{ background:#0B1220; }
+  body.dark .phone{ background:#0B1220; }
+  body.dark .content > *{ filter:none; }
+  body.dark .streak-card, body.dark .continue-card, body.dark .test-card,
+  body.dark .rec-card, body.dark .challenge-card.weekly, body.dark .quick-item,
+  body.dark .bottom-nav{ background:#16213E; color:#EDEDED; box-shadow:none; }
+  body.dark .streak-label, body.dark .continue-info p, body.dark .test-info p,
+  body.dark .rec-card p, body.dark .nav-item{ color:#9BA3B4; }
+  body.dark .continue-info h4, body.dark .test-info h4, body.dark .rec-card h5,
+  body.dark .qi-label, body.dark .streak-num, body.dark .challenge-card.weekly .challenge-title{ color:#EDEDED; }
+  body.dark .resume-btn{ background:#0B1220; color:#EDEDED; }
+
+  .bottom-nav{ justify-content:space-between; padding:10px 22px 14px; align-items:center; }
+  .nav-center{ display:flex; align-items:center; justify-content:center; width:50px; height:50px; border-radius:50%; background:var(--navy); color:white; margin-top:-26px; box-shadow:0 6px 14px rgba(19,34,66,0.35); text-decoration:none; }
+  .nav-center .nav-icon{ font-size:21px; }
+  .nav-side{ display:flex; gap:20px; }
 </style>
 </head>
 <body>
@@ -271,16 +287,21 @@
 </div>
 
 <div class="bottom-nav">
-  <a href="index.html" class="nav-item active"><div class="nav-icon">🏠</div>Home</a>
-  <a href="subjects.html" class="nav-item"><div class="nav-icon">📚</div>Notes</a>
-  <a href="test-start.html" class="nav-item"><div class="nav-icon">📝</div>Test Zone</a>
-  <a href="doubts.html" class="nav-item"><div class="nav-icon">💬</div>Doubts</a>
-  <a href="profile.html" class="nav-item"><div class="nav-icon">👤</div>Profile</a>
+  <div class="nav-side">
+    <a href="subjects.html" class="nav-item"><div class="nav-icon">📚</div>Notes</a>
+    <a href="test-start.html" class="nav-item"><div class="nav-icon">📝</div>Test</a>
+  </div>
+  <a href="index.html" class="nav-center"><div class="nav-icon">🏠</div></a>
+  <div class="nav-side">
+    <a href="doubts.html" class="nav-item"><div class="nav-icon">🤖</div>AI</a>
+    <a href="profile.html" class="nav-item"><div class="nav-icon">👤</div>Profile</a>
+  </div>
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="supabase-config.js"></script>
 <script>
+  if (localStorage.getItem('nw_dark_mode') === '1') document.body.classList.add('dark');
   if (sessionStorage.getItem('nw_splash_shown')) {
     document.getElementById('splash').style.display = 'none';
   } else {
