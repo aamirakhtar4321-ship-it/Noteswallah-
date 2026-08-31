@@ -154,7 +154,6 @@
 
   let adCounts = {};
   function startAdUnlock(noteId){
-    const { data: { session } } = supabaseClient.auth.getSession ? {} : {};
     if (!adCounts[noteId]) adCounts[noteId] = 0;
     adCounts[noteId]++;
     const progress = document.getElementById(`adProgress-${noteId}`);
