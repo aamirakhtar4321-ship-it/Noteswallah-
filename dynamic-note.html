@@ -123,7 +123,9 @@
             <div class="lock-icon">🔒</div>
             <h3>${pn.title}</h3>
             <p>${pn.page_count || '?'} pages · Unlock for ${pn.xp_cost} XP · Re-locks every 1 May</p>
-            <button class="unlock-btn" onclick="tryUnlock(${pn.id}, ${pn.xp_cost})">Unlock Now</button>
+            <button class="unlock-btn" onclick="tryUnlock(${pn.id}, ${pn.xp_cost})">Unlock with ${pn.xp_cost} XP</button>
+            <button class="unlock-btn" style="background:transparent; color:white; border:1.5px solid rgba(255,255,255,0.4); margin-top:8px;" onclick="startAdUnlock(${pn.id})">▶ Or Watch 3 Ads (Free)</button>
+            <div id="adProgress-${pn.id}" style="font-size:11px; opacity:0.85; margin-top:8px; display:none;"></div>
           </div>
           <div class="disclaimer-box" id="disclaimer-${pn.id}">⚠️ Not enough XP yet. Earn XP by completing Daily & Weekly Challenge tests, then come back to unlock this.</div>`;
       }
@@ -146,6 +148,31 @@
     }
     await supabaseClient.from('profiles').update({ total_xp: profile.total_xp - cost }).eq('id', session.user.id);
     await supabaseClient.from('xp_transactions').insert({ user_id: session.user.id, amount: -cost, type: 'spent_unlock_note' });
+    await supabaseClient.from('user_unlocked_notes').upsert({ user_id: session.user.id, professional_note_id: noteId, unlocked_at: new Date().toISOString() });
+    location.reload();
+  }
+
+  let adCounts = {};
+  function startAdUnlock(noteId){
+    const { data: { session } } = supabaseClient.auth.getSession ? {} : {};
+    if (!adCounts[noteId]) adCounts[noteId] = 0;
+    adCounts[noteId]++;
+    const progress = document.getElementById(`adProgress-${noteId}`);
+    progress.style.display = 'block';
+
+    if (adCounts[noteId] < 3) {
+      progress.textContent = `📺 Ad ${adCounts[noteId]} of 3 watched — tap again for the next ad`;
+      alert(`(Placeholder) Simulated ad ${adCounts[noteId]} of 3 would play here. Real video ads will be wired in during the Play Store phase.`);
+    } else {
+      progress.textContent = `✅ All 3 ads watched — unlocking...`;
+      alert('(Placeholder) 3rd ad watched. Unlocking this note for free.');
+      unlockViaAds(noteId);
+    }
+  }
+
+  async function unlockViaAds(noteId){
+    const { data: { session } } = await supabaseClient.auth.getSession();
+    if (!session) { window.location.href = "login.html"; return; }
     await supabaseClient.from('user_unlocked_notes').upsert({ user_id: session.user.id, professional_note_id: noteId, unlocked_at: new Date().toISOString() });
     location.reload();
   }
