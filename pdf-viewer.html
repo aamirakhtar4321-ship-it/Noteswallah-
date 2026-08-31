@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Notes Wallah — Viewing</title>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:wght@700&family=Inter:wght@600;700&display=swap" rel="stylesheet">
+<style>
+  :root{ --navy:#132242; --gold:#E8A33D; }
+  *{box-sizing:border-box; margin:0; padding:0;}
+  body{ font-family:'Inter',sans-serif; }
+  .topbar{ background:var(--navy); color:white; padding:14px 16px; display:flex; align-items:center; gap:12px; }
+  .back-btn{ width:34px; height:34px; border-radius:50%; background:rgba(255,255,255,0.1); display:flex; align-items:center; justify-content:center; cursor:pointer; text-decoration:none; color:white; flex-shrink:0; }
+  .topbar h1{ font-size:14.5px; font-weight:700; }
+  .watch-badge{ font-size:10px; background:var(--gold); color:var(--navy); padding:3px 8px; border-radius:8px; font-weight:700; margin-left:auto; }
+  iframe{ width:100%; height:calc(100vh - 54px); border:none; }
+</style>
+</head>
+<body>
+  <div class="topbar">
+    <a href="javascript:history.back()" class="back-btn">←</a>
+    <h1 id="docTitle">Professional Notes</h1>
+    <div class="watch-badge">View Only</div>
+  </div>
+  <iframe id="pdfFrame" src=""></iframe>
+  <script>
+    const params = new URLSearchParams(window.location.search);
+    const url = params.get('url');
+    const title = params.get('title');
+    if (title) document.getElementById('docTitle').textContent = decodeURIComponent(title);
+    if (url) {
+      // Google Docs viewer wrapper — renders the PDF as an image-based viewer,
+      // which makes casual right-click/save much harder than opening a raw PDF link.
+      document.getElementById('pdfFrame').src = 'https://docs.google.com/gview?url=' + encodeURIComponent(url) + '&embedded=true';
+    }
+  </script>
+</body>
+</html>
