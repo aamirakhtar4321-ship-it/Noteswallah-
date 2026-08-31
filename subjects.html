@@ -61,9 +61,15 @@
   const ICONS = { 'Mathematics':'∑', 'Science':'🧪', 'Social Science':'🌍', 'English':'🔤', 'Hindi':'अ', 'Urdu':'🕌' };
 
   (async () => {
-    const { data: subjects } = await supabaseClient.from('subjects').select('*').order('id');
+    const { data: { session } } = await supabaseClient.auth.getSession();
+    if (!session) { window.location.href = "login.html"; return; }
+    const { data: profile } = await supabaseClient.from('profiles').select('*').eq('id', session.user.id).single();
+    const classBoard = profile ? `Class ${profile.class_selected} ${profile.board}` : null;
+    if (profile) document.getElementById('userClassLine').textContent = `Class ${profile.class_selected} · ${profile.board}`;
+
+    const { data: subjects } = await supabaseClient.from('subjects').select('*').eq('class_board', classBoard).order('id');
     const list = document.getElementById('subjectList');
-    if (!subjects || subjects.length === 0) { list.innerHTML = '<div class="empty">No subjects added yet.</div>'; return; }
+    if (!subjects || subjects.length === 0) { list.innerHTML = `<div class="empty">No subjects added yet for ${classBoard || 'your class'}. Check back soon!</div>`; return; }
 
     list.innerHTML = '';
     for (const subj of subjects) {
