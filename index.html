@@ -142,20 +142,22 @@
   .nav-icon{ font-size:19px; }
   body.dark{ background:#0B1220; }
   body.dark .phone{ background:#0B1220; }
-  body.dark .content > *{ filter:none; }
   body.dark .streak-card, body.dark .continue-card, body.dark .test-card,
   body.dark .rec-card, body.dark .challenge-card.weekly, body.dark .quick-item,
-  body.dark .bottom-nav{ background:#16213E; color:#EDEDED; box-shadow:none; }
+  body.dark .bottom-nav, body.dark .teaser-card{ background:#16213E !important; color:#EDEDED !important; box-shadow:none; }
+  body.dark .streak-card *, body.dark .continue-card *, body.dark .test-card *,
+  body.dark .rec-card *, body.dark .challenge-card.weekly *, body.dark .quick-item *{ color:#EDEDED !important; }
   body.dark .streak-label, body.dark .continue-info p, body.dark .test-info p,
-  body.dark .rec-card p, body.dark .nav-item{ color:#9BA3B4; }
-  body.dark .continue-info h4, body.dark .test-info h4, body.dark .rec-card h5,
-  body.dark .qi-label, body.dark .streak-num, body.dark .challenge-card.weekly .challenge-title{ color:#EDEDED; }
-  body.dark .resume-btn{ background:#0B1220; color:#EDEDED; }
+  body.dark .rec-card p, body.dark .nav-item, body.dark .challenge-tag,
+  body.dark .rec-tag{ color:#9BA3B4 !important; }
+  body.dark .nav-item.active, body.dark .nav-center{ color:#EDEDED !important; }
+  body.dark .resume-btn{ background:#0B1220; color:#EDEDED !important; }
+  body.dark .section-title{ color:#EDEDED; }
+  body.dark .progress-bar{ background:#2A3654; }
 
-  .bottom-nav{ justify-content:space-between; padding:10px 22px 14px; align-items:center; }
-  .nav-center{ display:flex; align-items:center; justify-content:center; width:50px; height:50px; border-radius:50%; background:var(--navy); color:white; margin-top:-26px; box-shadow:0 6px 14px rgba(19,34,66,0.35); text-decoration:none; }
+  .bottom-nav{ justify-content:space-between; padding:10px 18px 14px; align-items:center; }
+  .nav-center{ display:flex; align-items:center; justify-content:center; width:50px; height:50px; border-radius:50%; background:var(--navy); color:white; margin-top:-26px; box-shadow:0 6px 14px rgba(19,34,66,0.35); text-decoration:none; flex-shrink:0; }
   .nav-center .nav-icon{ font-size:21px; }
-  .nav-side{ display:flex; gap:20px; }
 </style>
 </head>
 <body>
@@ -287,15 +289,11 @@
 </div>
 
 <div class="bottom-nav">
-  <div class="nav-side">
-    <a href="subjects.html" class="nav-item"><div class="nav-icon">📚</div>Notes</a>
-    <a href="test-start.html" class="nav-item"><div class="nav-icon">📝</div>Test</a>
-  </div>
+  <a href="subjects.html" class="nav-item"><div class="nav-icon">📚</div>Notes</a>
+  <a href="test-start.html" class="nav-item"><div class="nav-icon">📝</div>Test</a>
   <a href="index.html" class="nav-center"><div class="nav-icon">🏠</div></a>
-  <div class="nav-side">
-    <a href="doubts.html" class="nav-item"><div class="nav-icon">🤖</div>AI</a>
-    <a href="profile.html" class="nav-item"><div class="nav-icon">👤</div>Profile</a>
-  </div>
+  <a href="doubts.html" class="nav-item"><div class="nav-icon">🤖</div>AI</a>
+  <a href="profile.html" class="nav-item"><div class="nav-icon">👤</div>Profile</a>
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -338,3 +336,4 @@
 
 </body>
 </html>
+
