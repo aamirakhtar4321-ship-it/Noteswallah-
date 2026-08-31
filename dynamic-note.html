@@ -20,13 +20,26 @@
   .note-body{ background:white; margin:14px 18px; padding:20px; border-radius:var(--radius); box-shadow:var(--shadow); }
   .note-body p{ font-size:14.5px; line-height:1.75; color:#333; white-space:pre-wrap; }
   .empty{ text-align:center; padding:50px 20px; color:var(--grey); font-size:13px; }
-  .pro-card{ margin:14px 18px; background:white; border-radius:var(--radius); box-shadow:var(--shadow); padding:16px; display:flex; align-items:center; gap:12px; }
-  .pro-icon{ width:44px; height:44px; border-radius:12px; background:var(--cream); display:flex; align-items:center; justify-content:center; font-size:20px; }
-  .pro-info{ flex:1; }
-  .pro-info h4{ font-size:13.5px; font-weight:600; }
-  .pro-info p{ font-size:11px; color:var(--grey); margin-top:2px; }
-  .pro-btn{ background:var(--navy); color:white; border:none; padding:9px 14px; border-radius:10px; font-size:11.5px; font-weight:700; cursor:pointer; white-space:nowrap; text-decoration:none; }
+
+  .tab-row{ display:flex; gap:8px; margin:14px 18px 0; }
+  .tab-btn{ flex:1; padding:11px; border-radius:12px; text-align:center; font-size:13px; font-weight:700; cursor:pointer; background:white; color:var(--navy); box-shadow:var(--shadow); border:1.5px solid transparent; }
+  .tab-btn.active{ border-color:var(--gold); background:#FFF8EC; }
+  .tab-panel{ display:none; }
+  .tab-panel.show{ display:block; }
+
+  .pro-locked{ margin:14px 18px; background:linear-gradient(135deg,#2B1B4A,#4A2D7A); border-radius:var(--radius); padding:24px 20px; text-align:center; color:white; }
+  .pro-locked .lock-icon{ font-size:34px; margin-bottom:10px; }
+  .pro-locked h3{ font-family:'Fraunces'; font-size:16px; margin-bottom:6px; }
+  .pro-locked p{ font-size:12px; opacity:0.85; line-height:1.6; }
+  .pro-locked .unlock-btn{ margin-top:14px; background:var(--gold); color:var(--navy); border:none; padding:11px 22px; border-radius:12px; font-weight:700; font-size:13px; cursor:pointer; }
+  .disclaimer-box{ margin:12px 18px 0; background:#FBEAE8; color:#8C2A20; padding:12px 14px; border-radius:12px; font-size:12px; line-height:1.5; display:none; }
+  .disclaimer-box.show{ display:block; }
+  .no-download-note{ text-align:center; font-size:10.5px; color:var(--grey); margin:10px 18px 0; }
 </style>
+<script>
+  // Prevent easy text/right-click copy on note content (basic deterrent, not foolproof)
+  document.addEventListener('contextmenu', e => { if(e.target.closest('.note-body')) e.preventDefault(); });
+</script>
 </head>
 <body>
 <div class="phone">
@@ -34,13 +47,40 @@
     <a href="javascript:history.back()" class="back-btn">←</a>
     <h1 id="chapterTitle">Loading...</h1>
   </div>
-  <div class="note-body" id="noteContent"><p>Loading note content...</p></div>
-  <div id="proNoteArea"></div>
+
+  <div class="tab-row">
+    <div class="tab-btn active" id="tabNormal" onclick="switchTab('normal')">📖 Normal Notes</div>
+    <div class="tab-btn" id="tabPro" onclick="switchTab('pro')">📄 Pro Notes</div>
+  </div>
+
+  <div class="tab-panel show" id="panelNormal">
+    <div class="note-body" id="noteContent" style="user-select:none;"><p>Loading note content...</p></div>
+    <div class="no-download-note">🔒 View-only inside the app — cannot be downloaded</div>
+  </div>
+
+  <div class="tab-panel" id="panelPro"></div>
 </div>
 
 <script>
   const params = new URLSearchParams(window.location.search);
   const chapterId = params.get('chapter_id');
+  const MAY_1_MONTH = 4; // 0-indexed: May = 4
+
+  function switchTab(tab){
+    document.getElementById('tabNormal').classList.toggle('active', tab === 'normal');
+    document.getElementById('tabPro').classList.toggle('active', tab === 'pro');
+    document.getElementById('panelNormal').classList.toggle('show', tab === 'normal');
+    document.getElementById('panelPro').classList.toggle('show', tab === 'pro');
+  }
+
+  function isExpiredByAnnualLock(unlockedAtStr){
+    const unlockedAt = new Date(unlockedAtStr);
+    const now = new Date();
+    // This cycle's May 1st
+    let cycleMay1 = new Date(now.getFullYear(), MAY_1_MONTH, 1);
+    if (now < cycleMay1) cycleMay1.setFullYear(cycleMay1.getFullYear() - 1); // if before May 1 this year, use last year's May 1 as cycle start
+    return unlockedAt < cycleMay1;
+  }
 
   (async () => {
     if (!chapterId) return;
@@ -52,38 +92,61 @@
     noteDiv.innerHTML = note && note.content ? `<p>${note.content}</p>` : '<div class="empty">No notes added yet for this chapter. Check back soon!</div>';
 
     const { data: proNotes } = await supabaseClient.from('professional_notes').select('*').eq('chapter_id', chapterId);
-    const proArea = document.getElementById('proNoteArea');
-    if (proNotes && proNotes.length > 0) {
-      const { data: { session } } = await supabaseClient.auth.getSession();
-      for (const pn of proNotes) {
-        let unlocked = false;
-        if (session) {
-          const { data: unlock } = await supabaseClient.from('user_unlocked_notes').select('*').eq('user_id', session.user.id).eq('professional_note_id', pn.id).maybeSingle();
-          unlocked = !!unlock;
-        }
-        const card = document.createElement('div');
-        card.className = 'pro-card';
-        if (unlocked) {
-          card.innerHTML = `<div class="pro-icon">📄</div><div class="pro-info"><h4>${pn.title}</h4><p>${pn.page_count || '?'} pages · Unlocked</p></div><a href="${pn.pdf_url}" target="_blank" class="pro-btn">Open PDF</a>`;
-        } else {
-          card.innerHTML = `<div class="pro-icon">🔒</div><div class="pro-info"><h4>${pn.title}</h4><p>${pn.page_count || '?'} pages · ${pn.xp_cost} XP to unlock</p></div><button class="pro-btn" onclick="unlockNote(${pn.id}, ${pn.xp_cost})">Unlock</button>`;
-        }
-        proArea.appendChild(card);
+    const proArea = document.getElementById('panelPro');
+    const { data: { session } } = await supabaseClient.auth.getSession();
+
+    if (!proNotes || proNotes.length === 0) {
+      proArea.innerHTML = '<div class="empty">No Professional Notes added yet for this chapter.</div>';
+      return;
+    }
+
+    for (const pn of proNotes) {
+      let unlocked = false;
+      if (session) {
+        const { data: unlock } = await supabaseClient.from('user_unlocked_notes').select('*').eq('user_id', session.user.id).eq('professional_note_id', pn.id).maybeSingle();
+        if (unlock && !isExpiredByAnnualLock(unlock.unlocked_at)) unlocked = true;
       }
+
+      const card = document.createElement('div');
+      if (unlocked) {
+        card.innerHTML = `
+          <div class="pro-locked" style="background:linear-gradient(135deg,#1B5E3A,#2E8B57);">
+            <div class="lock-icon">✅</div>
+            <h3>${pn.title}</h3>
+            <p>${pn.page_count || '?'} pages · Unlocked this cycle</p>
+            <button class="unlock-btn" style="background:white; color:#1B5E3A;" onclick="openPdf('${pn.pdf_url}', '${pn.title}')">Open Notes</button>
+          </div>
+          <div class="no-download-note">🔒 View-only inside the app — cannot be downloaded</div>`;
+      } else {
+        card.innerHTML = `
+          <div class="pro-locked">
+            <div class="lock-icon">🔒</div>
+            <h3>${pn.title}</h3>
+            <p>${pn.page_count || '?'} pages · Unlock for ${pn.xp_cost} XP · Re-locks every 1 May</p>
+            <button class="unlock-btn" onclick="tryUnlock(${pn.id}, ${pn.xp_cost})">Unlock Now</button>
+          </div>
+          <div class="disclaimer-box" id="disclaimer-${pn.id}">⚠️ Not enough XP yet. Earn XP by completing Daily & Weekly Challenge tests, then come back to unlock this.</div>`;
+      }
+      proArea.appendChild(card);
     }
   })();
 
-  async function unlockNote(noteId, cost){
+  function openPdf(url, title){
+    window.location.href = `pdf-viewer.html?url=${encodeURIComponent(url)}&title=${encodeURIComponent(title)}`;
+  }
+
+  async function tryUnlock(noteId, cost){
     const { data: { session } } = await supabaseClient.auth.getSession();
     if (!session) { window.location.href = "login.html"; return; }
     const { data: profile } = await supabaseClient.from('profiles').select('total_xp').eq('id', session.user.id).single();
+    const disclaimer = document.getElementById(`disclaimer-${noteId}`);
     if (!profile || profile.total_xp < cost) {
-      alert(`You need ${cost} XP to unlock this. Complete Daily/Weekly Challenges to earn more.`);
+      if (disclaimer) disclaimer.classList.add('show');
       return;
     }
     await supabaseClient.from('profiles').update({ total_xp: profile.total_xp - cost }).eq('id', session.user.id);
     await supabaseClient.from('xp_transactions').insert({ user_id: session.user.id, amount: -cost, type: 'spent_unlock_note' });
-    await supabaseClient.from('user_unlocked_notes').insert({ user_id: session.user.id, professional_note_id: noteId });
+    await supabaseClient.from('user_unlocked_notes').upsert({ user_id: session.user.id, professional_note_id: noteId, unlocked_at: new Date().toISOString() });
     location.reload();
   }
 </script>
