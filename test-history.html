@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Notes Wallah — Test History</title>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:wght@600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="supabase-config.js"></script>
+<style>
+  :root{ --navy:#132242; --gold:#E8A33D; --cream:#F7F5F0; --grey:#6B7280; --green:#2E8B57; --shadow:0 4px 16px rgba(19,34,66,0.08); }
+  *{box-sizing:border-box; margin:0; padding:0;}
+  body{ font-family:'Inter',sans-serif; background:var(--cream); display:flex; justify-content:center; }
+  .phone{ width:100%; max-width:430px; min-height:100vh; }
+  .topbar{ background:var(--navy); color:white; padding:16px 20px 20px; border-radius:0 0 24px 24px; display:flex; align-items:center; gap:14px; }
+  .back-btn{ width:36px; height:36px; border-radius:50%; background:rgba(255,255,255,0.1); display:flex; align-items:center; justify-content:center; cursor:pointer; text-decoration:none; color:white; }
+  .topbar h1{ font-family:'Fraunces',serif; font-size:18px; }
+  .content{ padding:18px; }
+  .attempt-card{ background:white; border-radius:14px; box-shadow:var(--shadow); padding:14px 16px; display:flex; justify-content:space-between; align-items:center; margin-bottom:10px; }
+  .score-circle{ width:44px; height:44px; border-radius:50%; border:3px solid var(--green); display:flex; align-items:center; justify-content:center; font-weight:700; font-size:12px; color:var(--navy); }
+  .attempt-info{ flex:1; margin-left:12px; }
+  .attempt-info h4{ font-size:13.5px; font-weight:600; }
+  .attempt-info p{ font-size:11px; color:var(--grey); margin-top:2px; }
+  .empty{ text-align:center; padding:60px 20px; color:var(--grey); font-size:13px; }
+</style>
+</head>
+<body>
+<div class="phone">
+  <div class="topbar">
+    <a href="profile.html" class="back-btn">←</a>
+    <h1>Test History</h1>
+  </div>
+  <div class="content" id="historyList"><div class="empty">Loading...</div></div>
+</div>
+<script>
+  (async () => {
+    const { data: { session } } = await supabaseClient.auth.getSession();
+    if (!session) { window.location.href = "login.html"; return; }
+    const { data: attempts } = await supabaseClient.from('test_attempts').select('*, chapters(title)').eq('user_id', session.user.id).order('created_at', { ascending: false });
+    const list = document.getElementById('historyList');
+    if (!attempts || attempts.length === 0) { list.innerHTML = '<div class="empty">No tests attempted yet. Go take one!</div>'; return; }
+    list.innerHTML = '';
+    attempts.forEach(a => {
+      const percent = Math.round((a.score / a.total) * 100);
+      const date = new Date(a.created_at).toLocaleDateString();
+      const div = document.createElement('div');
+      div.className = 'attempt-card';
+      div.innerHTML = `<div style="display:flex; align-items:center;"><div class="score-circle">${percent}%</div>
+        <div class="attempt-info"><h4>${a.chapters?.title || 'Chapter Test'}</h4><p>${a.score}/${a.total} correct · ${date}</p></div></div>`;
+      list.appendChild(div);
+    });
+  })();
+</script>
+</body>
+</html>
