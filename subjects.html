@@ -20,7 +20,7 @@
   .topbar p{ font-size:12.5px; color:#F6D9A6; margin-top:2px; }
   .content{ padding:18px; }
   .subject-card{ background:white; border-radius:var(--radius); box-shadow:var(--shadow); padding:16px; display:flex; align-items:center; gap:14px; margin-bottom:12px; text-decoration:none; color:var(--ink); }
-  .subject-icon{ width:48px; height:48px; border-radius:14px; flex-shrink:0; display:flex; align-items:center; justify-content:center; font-size:22px; color:white; background:var(--navy); }
+  .subject-icon{ width:48px; height:48px; border-radius:14px; flex-shrink:0; display:flex; align-items:center; justify-content:center; font-size:18px; font-weight:700; font-family:'Fraunces',serif; }
   .subject-info{ flex:1; }
   .subject-info h4{ font-size:15.5px; font-weight:600; }
   .subject-info p{ font-size:12px; color:var(--grey); margin-top:3px; }
@@ -58,7 +58,9 @@
 </div>
 
 <script>
-  const ICONS = { 'Mathematics':'∑', 'Science':'🧪', 'Social Science':'🌍', 'English':'🔤', 'Hindi':'अ', 'Urdu':'🕌' };
+  const ICONS = { 'Mathematics':'Ma', 'Science':'Sc', 'Social Science':'SS', 'English':'En', 'Hindi':'Hi', 'Urdu':'Ur' };
+  const COLORS = { 'Mathematics':'#FDE2E2', 'Science':'#DCFCE7', 'Social Science':'#EDE9FE', 'English':'#FEF3C7', 'Hindi':'#DBEAFE', 'Urdu':'#FCE7F3' };
+  const TEXTCOLORS = { 'Mathematics':'#C0392B', 'Science':'#166534', 'Social Science':'#6D28D9', 'English':'#92400E', 'Hindi':'#1D4ED8', 'Urdu':'#BE185D' };
 
   (async () => {
     const { data: { session } } = await supabaseClient.auth.getSession();
@@ -72,13 +74,18 @@
     if (!subjects || subjects.length === 0) { list.innerHTML = `<div class="empty">No subjects added yet for ${classBoard || 'your class'}. Check back soon!</div>`; return; }
 
     list.innerHTML = '';
-    for (const subj of subjects) {
+    const results = await Promise.all(subjects.map(async (subj) => {
       const { count } = await supabaseClient.from('chapters').select('*', { count: 'exact', head: true }).eq('subject_id', subj.id);
+      return { subj, count };
+    }));
+    for (const { subj, count } of results) {
       const a = document.createElement('a');
       a.href = `dynamic-chapters.html?subject_id=${subj.id}`;
       a.className = 'subject-card';
-      a.innerHTML = `<div class="subject-icon">${ICONS[subj.name] || subj.icon || '📘'}</div>
-        <div class="subject-info"><h4>${subj.name}</h4><p>${count || 0} chapter${count === 1 ? '' : 's'}</p></div>
+      const bg = COLORS[subj.name] || '#EEE';
+      const fg = TEXTCOLORS[subj.name] || 'var(--navy)';
+      a.innerHTML = `<div class="subject-icon" style="background:${bg}; color:${fg};">${ICONS[subj.name] || (subj.name||'').slice(0,2)}</div>
+        <div class="subject-info"><h4>${subj.name}</h4><p>${count || 0} chapter${count === 1 ? '' : 's'} · notes + tests</p></div>
         <div class="chevron">›</div>`;
       list.appendChild(a);
     }
