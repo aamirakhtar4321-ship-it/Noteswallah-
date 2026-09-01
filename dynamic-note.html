@@ -35,6 +35,11 @@
   .disclaimer-box{ margin:12px 18px 0; background:#FBEAE8; color:#8C2A20; padding:12px 14px; border-radius:12px; font-size:12px; line-height:1.5; display:none; }
   .disclaimer-box.show{ display:block; }
   .no-download-note{ text-align:center; font-size:10.5px; color:var(--grey); margin:10px 18px 0; }
+
+  body.dark{ background:#0B1220; color:#EDEDED; }
+  body.dark .note-body, body.dark .q-block, body.dark .stat-box,
+  body.dark .cert-frame, body.dark .attempt-card{ background:#16213E !important; color:#EDEDED !important; }
+  body.dark .note-body p, body.dark .empty{ color:#C7CCDA !important; }
 </style>
 <script>
   // Prevent easy text/right-click copy on note content (basic deterrent, not foolproof)
@@ -42,6 +47,7 @@
 </script>
 </head>
 <body>
+<script>if(localStorage.getItem('nw_dark_mode')==='1')document.body.classList.add('dark');</script>
 <div class="phone">
   <div class="topbar">
     <a href="javascript:history.back()" class="back-btn">←</a>
