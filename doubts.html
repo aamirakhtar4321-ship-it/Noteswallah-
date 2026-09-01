@@ -217,7 +217,7 @@
 </script>
 
 <script>
-  const GEMINI_API_KEY = AQ.Ab8RN6KHFlsFFdJ577Ntn-RK6w0PC6NtVE7BHpyv_LpCLJrnng;
+  const GEMINI_API_KEY = "AQ.Ab8RN6KHFlsFFdJ577Ntn-RK6w0PC6NtVE7BHpyv_LpCLJrnng";
 
   async function sendDoubt(){
     const input = document.getElementById('doubtInput');
@@ -244,7 +244,16 @@
         body: JSON.stringify({ contents: [{ parts: [{ text: `You are Sara, a friendly study helper for an Indian student app called Notes Wallah. Explain this doubt clearly, step by step, in simple language: ${text}` }] }] })
       });
       const data = await res.json();
-      bubble.textContent = data?.candidates?.[0]?.content?.parts?.[0]?.text || "Sorry, I couldn't understand that. Try rephrasing your doubt.";
+      console.log('Gemini API response:', data);
+      if (data.error) {
+        bubble.textContent = "API Error: " + data.error.message;
+      } else if (data?.candidates?.[0]?.content?.parts?.[0]?.text) {
+        bubble.textContent = data.candidates[0].content.parts[0].text;
+      } else if (data?.candidates?.[0]?.finishReason) {
+        bubble.textContent = "Response blocked (reason: " + data.candidates[0].finishReason + "). Try rephrasing.";
+      } else {
+        bubble.textContent = "Unexpected response — check browser console (long-press page → Inspect) for details.";
+      }
     } catch(e) {
       bubble.textContent = "I'm having trouble connecting right now. Please check your internet and try again.";
     }
