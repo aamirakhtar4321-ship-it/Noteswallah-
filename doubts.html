@@ -26,10 +26,17 @@
     display:flex; align-items:center; justify-content:center; font-size:16px; cursor:pointer; text-decoration:none; color:white;
   }
   .sara-avatar{
-    width:42px; height:42px; border-radius:50%;
-    background:linear-gradient(160deg,var(--gold-light),var(--gold));
-    display:flex; align-items:center; justify-content:center; font-size:20px; flex-shrink:0;
+    width:42px; height:42px; border-radius:12px;
+    background:linear-gradient(160deg,#1D3560,var(--navy));
+    display:flex; align-items:center; justify-content:center; font-size:19px; flex-shrink:0;
+    border:1.5px solid rgba(232,163,61,0.4);
   }
+  .status-dot{ width:7px; height:7px; border-radius:50%; background:#2ECC71; display:inline-block; margin-right:4px; }
+  .typing-dots{ display:inline-flex; gap:3px; align-items:center; }
+  .typing-dots span{ width:6px; height:6px; border-radius:50%; background:var(--grey); animation:typingBounce 1.2s infinite ease-in-out; }
+  .typing-dots span:nth-child(2){ animation-delay:.2s; }
+  .typing-dots span:nth-child(3){ animation-delay:.4s; }
+  @keyframes typingBounce{ 0%,60%,100%{ transform:translateY(0); opacity:.4; } 30%{ transform:translateY(-4px); opacity:1; } }
   .topbar h1{ font-size:18px; font-weight:600; }
   .topbar p{ font-size:11.5px; color:var(--gold-light); margin-top:2px; }
 
@@ -89,17 +96,28 @@
     position:fixed; bottom:78px; width:100%; max-width:430px; background:white;
     border-top:1px solid #EEE; display:none;
   }
+
+  body.dark{ background:#0B1220; }
+  body.dark .phone{ background:#0B1220; }
+  body.dark .chapter-card, body.dark .cert-card, body.dark .note-card, body.dark .bottom-nav,
+  body.dark .bubble.sara, body.dark .intro-card{ background:#16213E !important; box-shadow:none; }
+  body.dark .chapter-card *, body.dark .cert-card *, body.dark .note-card *,
+  body.dark .bubble.sara, body.dark .intro-card *{ color:#EDEDED !important; }
+  body.dark .nav-item{ color:#9BA3B4 !important; }
+  .bottom-nav{ justify-content:space-between; padding:10px 18px 14px; align-items:center; }
+  .nav-center{ display:flex; align-items:center; justify-content:center; width:50px; height:50px; border-radius:50%; background:var(--navy); color:white; margin-top:-26px; box-shadow:0 6px 14px rgba(19,34,66,0.35); text-decoration:none; flex-shrink:0; }
 </style>
 </head>
 <body>
+<script>if(localStorage.getItem('nw_dark_mode')==='1')document.body.classList.add('dark');</script>
 
 <div class="phone">
   <div class="topbar">
     <a href="index.html" class="back-btn">←</a>
     <div class="sara-avatar">✨</div>
     <div>
-      <h1>Sara — Your Study Buddy</h1>
-      <p>● Online · Ready to help with any doubt</p>
+      <h1>Sara — AI Study Assistant</h1>
+      <p><span class="status-dot"></span>Online · Ready to help</p>
     </div>
   </div>
 
@@ -127,15 +145,69 @@
     </div>
     <div class="input-row">
       <input type="text" id="doubtInput" placeholder="Type your doubt here...">
-      <div class="icon-round">📷</div>
-      <div class="icon-round">🎤</div>
+      <input type="file" id="photoInput" accept="image/*" style="display:none;" onchange="sendPhoto(this)">
+      <div class="icon-round" onclick="document.getElementById('photoInput').click()">📷</div>
+      <div class="icon-round" id="micBtn" onclick="startVoice()">🎤</div>
       <div class="icon-round send" onclick="sendDoubt()">➤</div>
     </div>
   </div>
 </div>
 
 <script>
-  function sendDoubt(){
+  async function sendPhoto(input){
+    const file = input.files[0];
+    if (!file) return;
+    const chat = document.getElementById('chatArea');
+    const reader = new FileReader();
+    reader.onload = async function(e){
+      const base64 = e.target.result.split(',')[1];
+      const userRow = document.createElement('div');
+      userRow.className = 'msg-row user';
+      userRow.innerHTML = `<div class="mini-avatar user-av">🙂</div><div class="bubble user"><img src="${e.target.result}" style="max-width:100%; border-radius:10px;"></div>`;
+      chat.appendChild(userRow);
+
+      const saraRow = document.createElement('div');
+      saraRow.className = 'msg-row';
+      saraRow.innerHTML = `<div class="mini-avatar">✨</div><div class="bubble sara"><span class="typing-dots"><span></span><span></span><span></span></span></div>`;
+      chat.appendChild(saraRow);
+      const bubble = saraRow.querySelector('.bubble');
+
+      try {
+        const res = await fetch(EDGE_FUNCTION_URL, {
+          method: 'POST',
+          headers: {'Content-Type': 'application/json', 'Authorization': `Bearer ${SUPABASE_ANON_KEY}`},
+          body: JSON.stringify({
+            prompt: "You are Sara, a friendly study helper. This is a photo of a student's question or textbook problem. Read it and explain the answer step by step in simple language.",
+            image: { mimeType: file.type, data: base64 }
+          })
+        });
+        const data = await res.json();
+        bubble.textContent = data.reply || "Sorry, I couldn't read that clearly. Try a clearer photo.";
+      } catch(err){ bubble.textContent = "Connection issue — please try again."; }
+    };
+    reader.readAsDataURL(file);
+  }
+
+  function startVoice(){
+    const SpeechRec = window.SpeechRecognition || window.webkitSpeechRecognition;
+    if (!SpeechRec) { alert('Voice input is not supported on this browser.'); return; }
+    const rec = new SpeechRec();
+    rec.lang = 'en-IN';
+    document.getElementById('micBtn').textContent = '🔴';
+    rec.onresult = (e) => {
+      document.getElementById('doubtInput').value = e.results[0][0].transcript;
+      document.getElementById('micBtn').textContent = '🎤';
+    };
+    rec.onerror = () => { document.getElementById('micBtn').textContent = '🎤'; };
+    rec.onend = () => { document.getElementById('micBtn').textContent = '🎤'; };
+    rec.start();
+  }
+</script>
+
+<script>
+  const EDGE_FUNCTION_URL = "https://zctzpiwjkzmxteatwggr.supabase.co/functions/v1/ask-sara";
+
+  async function sendDoubt(){
     const input = document.getElementById('doubtInput');
     const text = input.value.trim();
     if(!text) return;
@@ -147,13 +219,23 @@
     chat.appendChild(userRow);
     input.value = '';
 
-    setTimeout(() => {
-      const saraRow = document.createElement('div');
-      saraRow.className = 'msg-row';
-      saraRow.innerHTML = `<div class="mini-avatar">✨</div><div class="bubble sara">Great question! This is a placeholder reply — once Sara is connected to a real AI backend, she'll explain "${text}" step by step with examples from your syllabus.</div>`;
-      chat.appendChild(saraRow);
-      window.scrollTo(0, document.body.scrollHeight);
-    }, 700);
+    const saraRow = document.createElement('div');
+    saraRow.className = 'msg-row';
+    saraRow.innerHTML = `<div class="mini-avatar">✨</div><div class="bubble sara"><span class="typing-dots"><span></span><span></span><span></span></span></div>`;
+    chat.appendChild(saraRow);
+    const bubble = saraRow.querySelector('.bubble');
+
+    try {
+      const res = await fetch(EDGE_FUNCTION_URL, {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json', 'Authorization': `Bearer ${SUPABASE_ANON_KEY}`},
+        body: JSON.stringify({ prompt: `You are Sara, a friendly study helper for an Indian student app called Notes Wallah. Explain this doubt clearly, step by step, in simple language: ${text}` })
+      });
+      const data = await res.json();
+      bubble.textContent = data.reply || "Sorry, I couldn't understand that. Try rephrasing your doubt.";
+    } catch(e) {
+      bubble.textContent = "I'm having trouble connecting right now. Please check your internet and try again.";
+    }
   }
   document.getElementById('doubtInput').addEventListener('keypress', function(e){
     if(e.key === 'Enter') sendDoubt();
