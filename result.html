@@ -46,9 +46,15 @@
   .action-btn.primary{ background:var(--navy); color:white; }
   .action-btn.secondary{ background:white; color:var(--navy); box-shadow:var(--shadow); }
   .action-btn.gold{ background:var(--gold); color:var(--navy); }
+
+  body.dark{ background:#0B1220; color:#EDEDED; }
+  body.dark .note-body, body.dark .q-block, body.dark .stat-box,
+  body.dark .cert-frame, body.dark .attempt-card{ background:#16213E !important; color:#EDEDED !important; }
+  body.dark .note-body p, body.dark .empty{ color:#C7CCDA !important; }
 </style>
 </head>
 <body>
+<script>if(localStorage.getItem('nw_dark_mode')==='1')document.body.classList.add('dark');</script>
 
 <div class="phone">
   <div class="topbar">
@@ -59,6 +65,7 @@
   </div>
 
   <div class="content">
+    <div style="background:#EEE; color:#999; text-align:center; font-size:10.5px; padding:8px; border-radius:8px; margin-bottom:12px;">📢 Interstitial Ad Space (shown here after every test)</div>
     <div class="stat-grid">
       <div class="stat-box">
         <div class="num" id="correctCount">-</div>
