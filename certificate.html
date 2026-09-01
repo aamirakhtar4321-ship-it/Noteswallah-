@@ -88,9 +88,15 @@
     background:white; border-radius:12px; padding:12px 14px; margin-top:14px;
     font-size:11px; color:var(--grey); box-shadow:var(--shadow); line-height:1.5;
   }
+
+  body.dark{ background:#0B1220; color:#EDEDED; }
+  body.dark .note-body, body.dark .q-block, body.dark .stat-box,
+  body.dark .cert-frame, body.dark .attempt-card{ background:#16213E !important; color:#EDEDED !important; }
+  body.dark .note-body p, body.dark .empty{ color:#C7CCDA !important; }
 </style>
 </head>
 <body>
+<script>if(localStorage.getItem('nw_dark_mode')==='1')document.body.classList.add('dark');</script>
 
 <div class="phone">
   <div class="topbar">
