@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Notes Wallah — Mind Map</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="supabase-config.js"></script>
+<style>
+  :root{ --navy:#132242; --gold:#E8A33D; --cream:#F7F5F0; --ink:#1B1B1B; --grey:#6B7280; --radius:16px; --shadow:0 4px 16px rgba(19,34,66,0.08); }
+  *{box-sizing:border-box; margin:0; padding:0;}
+  body{ font-family:'Inter', sans-serif; background:var(--cream); color:var(--ink); display:flex; justify-content:center; }
+  .phone{ width:100%; max-width:430px; min-height:100vh; background:var(--cream); padding-bottom:30px; }
+  h1{ font-family:'Fraunces', serif; }
+  .topbar{ background:var(--navy); color:white; padding:16px 20px 20px; border-radius:0 0 24px 24px; display:flex; align-items:center; gap:14px; }
+  .back-btn{ width:36px; height:36px; border-radius:50%; background:rgba(255,255,255,0.1); display:flex; align-items:center; justify-content:center; cursor:pointer; text-decoration:none; color:white; }
+  .topbar h1{ font-size:17px; font-weight:600; }
+  .content{ padding:18px; display:grid; grid-template-columns:1fr 1fr; gap:12px; }
+  .mm-card{ background:white; border-radius:14px; box-shadow:var(--shadow); overflow:hidden; }
+  .mm-img{ width:100%; aspect-ratio:3/4; object-fit:cover; display:block; }
+  .mm-locked{ aspect-ratio:3/4; background:var(--navy); color:white; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:8px; padding:10px; text-align:center; }
+  .mm-locked .lock-icon{ font-size:26px; }
+  .mm-locked p{ font-size:10px; opacity:0.85; }
+  .mm-btns{ display:flex; flex-direction:column; gap:5px; width:100%; }
+  .mm-btn{ font-size:9.5px; font-weight:700; padding:6px; border-radius:8px; border:none; cursor:pointer; }
+  .mm-btn.xp{ background:var(--gold); color:var(--navy); }
+  .mm-btn.ad{ background:rgba(255,255,255,0.15); color:white; }
+  .empty{ grid-column:1/-1; text-align:center; padding:50px 20px; color:var(--grey); font-size:13px; }
+  .modal-overlay{ position:fixed; inset:0; background:rgba(0,0,0,0.85); display:none; align-items:center; justify-content:center; z-index:20; }
+  .modal-overlay.show{ display:flex; }
+  .modal-overlay img{ max-width:92%; max-height:85vh; border-radius:10px; }
+  .close-modal{ position:fixed; top:20px; right:20px; color:white; font-size:24px; cursor:pointer; }
+</style>
+</head>
+<body oncontextmenu="return false;">
+<script>if(localStorage.getItem('nw_dark_mode')==='1')document.body.classList.add('dark');</script>
+<div class="phone">
+  <div class="topbar">
+    <a href="mindmap-chapters.html" class="back-btn">←</a>
+    <h1 id="chapterTitle">Mind Maps</h1>
+  </div>
+  <div class="content" id="grid"><div class="empty">Loading...</div></div>
+</div>
+<div class="modal-overlay" id="imgModal"><div class="close-modal" onclick="closeModal()">✕</div><img id="modalImg" src=""></div>
+
+<script>
+  const params = new URLSearchParams(window.location.search);
+  const chapterId = params.get('chapter_id');
+  let adCounts = {};
+
+  (async () => {
+    const { data: chapter } = await supabaseClient.from('chapters').select('*').eq('id', chapterId).single();
+    if (chapter) document.getElementById('chapterTitle').textContent = chapter.title;
+
+    const { data: maps } = await supabaseClient.from('mind_maps').select('*').eq('chapter_id', chapterId).order('order_index');
+    const grid = document.getElementById('grid');
+    if (!maps || maps.length === 0) { grid.innerHTML = '<div class="empty">No mind maps for this chapter yet.</div>'; return; }
+
+    const { data: { session } } = await supabaseClient.auth.getSession();
+    grid.innerHTML = '';
+    for (const mm of maps) {
+      let unlocked = false;
+      if (session) {
+        const { data: u } = await supabaseClient.from('user_unlocked_mindmaps').select('*').eq('user_id', session.user.id).eq('mind_map_id', mm.id).maybeSingle();
+        unlocked = !!u;
+      }
+      const card = document.createElement('div');
+      card.className = 'mm-card';
+      if (unlocked) {
+        card.innerHTML = `<img src="${mm.image_url}" class="mm-img" onclick="openModal('${mm.image_url}')">`;
+      } else {
+        card.innerHTML = `<div class="mm-locked">
+          <div class="lock-icon">🔒</div>
+          <p>${mm.xp_cost} XP or 2 ads</p>
+          <div class="mm-btns">
+            <button class="mm-btn xp" onclick="unlockXP(${mm.id}, ${mm.xp_cost})">${mm.xp_cost} XP</button>
+            <button class="mm-btn ad" onclick="unlockAds(${mm.id})">▶ 2 Ads</button>
+          </div>
+        </div>`;
+      }
+      grid.appendChild(card);
+    }
+  })();
+
+  function openModal(url){ document.getElementById('modalImg').src = url; document.getElementById('imgModal').classList.add('show'); }
+  function closeModal(){ document.getElementById('imgModal').classList.remove('show'); }
+
+  async function unlockXP(id, cost){
+    const { data: { session } } = await supabaseClient.auth.getSession();
+    if (!session) { window.location.href = "login.html"; return; }
+    const { data: profile } = await supabaseClient.from('profiles').select('total_xp').eq('id', session.user.id).single();
+    if (!profile || profile.total_xp < cost) { alert(`Not enough XP. You need ${cost} XP — earn more from Daily/Weekly Challenges.`); return; }
+    await supabaseClient.from('profiles').update({ total_xp: profile.total_xp - cost }).eq('id', session.user.id);
+    await supabaseClient.from('xp_transactions').insert({ user_id: session.user.id, amount: -cost, type: 'spent_unlock_mindmap' });
+    await supabaseClient.from('user_unlocked_mindmaps').upsert({ user_id: session.user.id, mind_map_id: id });
+    location.reload();
+  }
+
+  function unlockAds(id){
+    if (!adCounts[id]) adCounts[id] = 0;
+    adCounts[id]++;
+    if (adCounts[id] < 2) {
+      alert(`(Placeholder) Ad ${adCounts[id]} of 2 watched. Tap again for the next one.`);
+    } else {
+      alert('(Placeholder) 2nd ad watched — unlocking this mind map for free.');
+      finishAdUnlock(id);
+    }
+  }
+
+  async function finishAdUnlock(id){
+    const { data: { session } } = await supabaseClient.auth.getSession();
+    if (!session) { window.location.href = "login.html"; return; }
+    await supabaseClient.from('user_unlocked_mindmaps').upsert({ user_id: session.user.id, mind_map_id: id });
+    location.reload();
+  }
+</script>
+</body>
+</html>
