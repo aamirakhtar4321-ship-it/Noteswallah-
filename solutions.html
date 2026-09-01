@@ -37,9 +37,15 @@
   .opt-letter{ width:20px; height:20px; border-radius:50%; background:white; display:flex; align-items:center; justify-content:center; font-size:10px; font-weight:700; flex-shrink:0; }
   .explanation{ font-size:12px; color:var(--grey); margin-top:8px; padding-top:8px; border-top:1px dashed #E3E1DB; line-height:1.5; }
   .explanation b{ color:var(--navy); }
+
+  body.dark{ background:#0B1220; color:#EDEDED; }
+  body.dark .note-body, body.dark .q-block, body.dark .stat-box,
+  body.dark .cert-frame, body.dark .attempt-card{ background:#16213E !important; color:#EDEDED !important; }
+  body.dark .note-body p, body.dark .empty{ color:#C7CCDA !important; }
 </style>
 </head>
 <body>
+<script>if(localStorage.getItem('nw_dark_mode')==='1')document.body.classList.add('dark');</script>
 
 <div class="phone">
   <div class="topbar">
