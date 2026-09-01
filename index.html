@@ -139,7 +139,7 @@
   .bottom-nav{ position:fixed; bottom:0; width:100%; max-width:430px; background:white; border-top:1px solid #EEE; display:flex; justify-content:space-around; padding:10px 0 14px; box-shadow:0 -4px 16px rgba(0,0,0,0.05); }
   .nav-item{ display:flex; flex-direction:column; align-items:center; gap:3px; font-size:10.5px; font-weight:600; color:var(--grey); cursor:pointer; text-decoration:none; }
   .nav-item.active{ color:var(--navy); }
-  .nav-icon{ font-size:19px; }
+  .nav-item{ display:flex; flex-direction:column; align-items:center; gap:4px; }
   body.dark{ background:#0B1220; }
   body.dark .phone{ background:#0B1220; }
   body.dark .streak-card, body.dark .continue-card, body.dark .test-card,
@@ -192,6 +192,7 @@
 
   <div class="content">
 
+    <div style="background:#EEE; color:#999; text-align:center; font-size:10.5px; padding:8px; border-radius:8px; margin-bottom:12px;">📢 Home Banner Ad Space</div>
     <div class="streak-card">
       <div class="streak-left">
         <div class="flame">🔥</div>
@@ -242,7 +243,7 @@
         <div class="challenge-tag">Daily · 20Q</div>
         <div class="challenge-title">Real Numbers Quiz</div>
         <div class="xp-pill">+10 XP</div>
-        <button class="challenge-btn" onclick="window.location.href='test-start.html'">Start</button>
+        <button class="challenge-btn" onclick="window.location.href='daily-challenge.html'">Start</button>
       </div>
       <div class="challenge-card weekly">
         <div class="challenge-tag" style="color:var(--grey);">Weekly · 30Q</div>
@@ -289,11 +290,16 @@
 </div>
 
 <div class="bottom-nav">
-  <a href="subjects.html" class="nav-item"><div class="nav-icon">📚</div>Notes</a>
-  <a href="test-start.html" class="nav-item"><div class="nav-icon">📝</div>Test</a>
-  <a href="index.html" class="nav-center"><div class="nav-icon">🏠</div></a>
-  <a href="doubts.html" class="nav-item"><div class="nav-icon">🤖</div>AI</a>
-  <a href="profile.html" class="nav-item"><div class="nav-icon">👤</div>Profile</a>
+  <a href="index.html" class="nav-item active">
+    <svg class="nav-icon" width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><path d="M9 22V12h6v10"/></svg>Home</a>
+  <a href="subjects.html" class="nav-item">
+    <svg class="nav-icon" width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>Notes</a>
+  <a href="test-start.html" class="nav-item">
+    <svg class="nav-icon" width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>Tests</a>
+  <a href="doubts.html" class="nav-item">
+    <svg class="nav-icon" width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="8" width="18" height="12" rx="2"/><circle cx="8.5" cy="14" r="1.2" fill="currentColor" stroke="none"/><circle cx="15.5" cy="14" r="1.2" fill="currentColor" stroke="none"/><path d="M12 8V4M8 4h8"/></svg>AI</a>
+  <a href="profile.html" class="nav-item">
+    <svg class="nav-icon" width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>Profile</a>
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -315,25 +321,4 @@
     const { data: { session } } = await supabaseClient.auth.getSession();
     if (!session) { window.location.href = "login.html"; return; }
 
-    const { data: profile } = await supabaseClient
-      .from('profiles')
-      .select('*')
-      .eq('id', session.user.id)
-      .single();
-
-    if (profile) {
-      const name = profile.name || "Student";
-      document.getElementById('greetText').textContent = greet + ", " + name;
-      document.getElementById('xpAmount').textContent = profile.total_xp || 0;
-      const classLine = document.getElementById('classLine');
-      if (classLine) {
-        classLine.textContent = (profile.class_selected ? "Class " + profile.class_selected + " · " : "") +
-          (profile.board || "") + (profile.medium ? " · " + profile.medium + " Medium" : "");
-      }
-    }
-  })();
-</script>
-
-</body>
-</html>
-
+    const { data: profile } 
