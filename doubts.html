@@ -187,7 +187,7 @@
           body: JSON.stringify({
             model: MODEL,
             messages: [{ role: 'user', content: [
-              { type: 'text', text: "You are Sara, a friendly study helper. This is a photo of a student's question or textbook problem. Read it and explain the answer step by step in simple language." },
+              { type: 'text', text: "You are Sara, a friendly study helper. This is a photo of a student's question or textbook problem. Answer in plain text only, no markdown symbols like asterisks or hashes. Keep it short and direct, a few sentences, not a long essay." },
               { type: 'image_url', image_url: { url: `data:${file.type};base64,${base64}` } }
             ]}]
           })
@@ -249,7 +249,7 @@
         },
         body: JSON.stringify({
           model: MODEL,
-          messages: [{ role: 'user', content: `You are Sara, a friendly study helper for an Indian student app called Notes Wallah. Explain this doubt clearly, step by step, in simple language: ${text}` }]
+          messages: [{ role: 'user', content: `You are Sara, a friendly study helper. Answer in plain text only, never use markdown symbols like ** or ##. Keep the answer SHORT: 2 to 5 sentences for simple questions, at most a short paragraph for complex ones. Be direct, no long intros. Student question: ${text}` }]
         })
       });
       const data = await res.json();
