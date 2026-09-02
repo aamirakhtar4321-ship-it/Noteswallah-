@@ -22,9 +22,7 @@
   .ch-num{ width:34px; height:34px; border-radius:10px; background:var(--cream); display:flex; align-items:center; justify-content:center; font-weight:700; font-size:13px; color:var(--navy); flex-shrink:0; }
   .ch-info h4{ font-size:14.5px; font-weight:600; }
   .empty{ text-align:center; padding:50px 20px; color:var(--grey); font-size:13px; }
-  .bottom-nav{ position:fixed; bottom:0; width:100%; max-width:430px; background:white; border-top:1px solid #EEE; display:flex; justify-content:space-around; padding:10px 0 14px; }
-  .nav-item{ display:flex; flex-direction:column; align-items:center; gap:3px; font-size:10.5px; font-weight:600; color:var(--grey); text-decoration:none; }
-  .nav-icon{ font-size:19px; }
+  .nav-item{ display:flex; flex-direction:column; align-items:center; gap:4px; }
 
   body.dark{ background:#0B1220; }
   body.dark .phone{ background:#0B1220; }
@@ -32,11 +30,7 @@
   body.dark .bubble.sara, body.dark .intro-card{ background:#16213E !important; box-shadow:none; }
   body.dark .chapter-card *, body.dark .cert-card *, body.dark .note-card *,
   body.dark .bubble.sara, body.dark .intro-card *{ color:#EDEDED !important; }
-  body.dark .nav-item{ color:#9BA3B4 !important; }
-  .bottom-nav{ justify-content:space-between; padding:10px 18px 14px; align-items:center; }
-  .nav-center{ display:flex; align-items:center; justify-content:center; width:50px; height:50px; border-radius:50%; background:var(--navy); color:white; margin-top:-26px; box-shadow:0 6px 14px rgba(19,34,66,0.35); text-decoration:none; flex-shrink:0; }
-
-  /* UNIVERSAL DARK MODE FIX — overrides core color variables so ALL text using them auto-fixes */
+  body.dark /* UNIVERSAL DARK MODE FIX — overrides core color variables so ALL text using them auto-fixes */
   body.dark{ --cream:#0B1220 !important; --ink:#EDEDED !important; --grey:#9BA3B4 !important; background:#0B1220 !important; }
   body.dark .phone{ background:#0B1220 !important; }
   body.dark .streak-card, body.dark .continue-card, body.dark .test-card, body.dark .rec-card,
@@ -45,8 +39,10 @@
   body.dark .cert-card, body.dark .note-card, body.dark .attempt-card, body.dark .intro-card,
   body.dark .bubble.sara, body.dark .q-card, body.dark .q-block, body.dark .cert-frame,
   body.dark .card, body.dark .info-card{ background:#16213E !important; box-shadow:none !important; border-color:#243256 !important; }
-  body.dark .nav-item{ color:#9BA3B4 !important; }
-  body.dark .nav-item.active{ color:#EDEDED !important; }
+  body.dark body.dark   .bottom-nav{ position:fixed; bottom:0; width:100%; max-width:430px; background:white; border-top:1px solid #EEE; display:flex; justify-content:space-around; padding:10px 8px 14px; box-shadow:0 -4px 16px rgba(0,0,0,0.05); }
+  .nav-item{ display:flex; flex-direction:column; align-items:center; gap:4px; font-size:10.5px; font-weight:600; color:var(--grey); text-decoration:none; padding:6px 10px; border-radius:12px; }
+  .nav-item.active{ background:#EEF1F8; color:var(--navy); }
+  body.dark .nav-item.active{ background:#1D2A47 !important; }
 </style>
 </head>
 <body>
@@ -59,11 +55,16 @@
   <div class="content" id="chapterList"><div class="empty">Loading chapters...</div></div>
 </div>
 <div class="bottom-nav">
-  <a href="subjects.html" class="nav-item"><div class="nav-icon">📚</div>Notes</a>
-  <a href="test-start.html" class="nav-item"><div class="nav-icon">📝</div>Test</a>
-  <a href="index.html" class="nav-center"><div class="nav-icon">🏠</div></a>
-  <a href="doubts.html" class="nav-item"><div class="nav-icon">🤖</div>AI</a>
-  <a href="profile.html" class="nav-item"><div class="nav-icon">👤</div>Profile</a>
+  <a href="index.html" class="nav-item">
+    <svg class="nav-icon" width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><path d="M9 22V12h6v10"/></svg>Home</a>
+  <a href="subjects.html" class="nav-item">
+    <svg class="nav-icon" width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>Notes</a>
+  <a href="test-start.html" class="nav-item">
+    <svg class="nav-icon" width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>Tests</a>
+  <a href="doubts.html" class="nav-item">
+    <svg class="nav-icon" width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="8" width="18" height="12" rx="2"/><circle cx="8.5" cy="14" r="1.2" fill="currentColor" stroke="none"/><circle cx="15.5" cy="14" r="1.2" fill="currentColor" stroke="none"/><path d="M12 8V4M8 4h8"/></svg>AI</a>
+  <a href="profile.html" class="nav-item">
+    <svg class="nav-icon" width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>Profile</a>
 </div>
 
 <script>
