@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html><head><meta charset="UTF-8"><title>AI Key Test</title></head>
+<body style="font-family:sans-serif; padding:20px;">
+<h2>Gemini API Key Test</h2>
+<p>This isolates whether the problem is your API key or the app code.</p>
+<button onclick="test()" style="padding:12px 20px; font-size:16px;">Test My Key</button>
+<pre id="output" style="background:#f0f0f0; padding:15px; margin-top:15px; white-space:pre-wrap; border-radius:8px;"></pre>
+
+<script>
+  const KEY = "PASTE_YOUR_KEY_HERE";
+  async function test(){
+    document.getElementById('output').textContent = "Testing...";
+    try {
+      const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${KEY}`, {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({ contents: [{ parts: [{ text: "Say hello in one sentence" }] }] })
+      });
+      const data = await res.json();
+      document.getElementById('output').textContent = JSON.stringify(data, null, 2);
+    } catch(e) {
+      document.getElementById('output').textContent = "Network error: " + e.message;
+    }
+  }
+</script>
+</body></html>
