@@ -37,8 +37,10 @@
   body.dark .cert-card, body.dark .note-card, body.dark .attempt-card, body.dark .intro-card,
   body.dark .bubble.sara, body.dark .q-card, body.dark .q-block, body.dark .cert-frame,
   body.dark .card, body.dark .info-card{ background:#16213E !important; box-shadow:none !important; border-color:#243256 !important; }
-  body.dark .nav-item{ color:#9BA3B4 !important; }
-  body.dark .nav-item.active{ color:#EDEDED !important; }
+  .bottom-nav{ position:fixed; bottom:0; width:100%; max-width:430px; background:white; border-top:1px solid #EEE; display:flex; justify-content:space-around; padding:10px 8px 14px; box-shadow:0 -4px 16px rgba(0,0,0,0.05); }
+  .nav-item{ display:flex; flex-direction:column; align-items:center; gap:4px; font-size:10.5px; font-weight:600; color:var(--grey); text-decoration:none; padding:6px 10px; border-radius:12px; }
+  .nav-item.active{ background:#EEF1F8; color:var(--navy); }
+  body.dark .nav-item.active{ background:#1D2A47 !important; }
 </style>
 </head>
 <body>
