@@ -65,7 +65,8 @@
 <div class="phone">
   <div class="topbar">
     <a href="javascript:history.back()" class="back-btn">←</a>
-    <h1 id="chapterTitle">Loading...</h1>
+    <h1 id="chapterTitle" style="flex:1;">Loading...</h1>
+    <div class="back-btn" id="bookmarkBtn" onclick="toggleBookmark()">🔖</div>
   </div>
 
   <div class="tab-row">
@@ -119,6 +120,7 @@
     if (!chapterId) return;
     const { data: chapter } = await supabaseClient.from('chapters').select('*').eq('id', chapterId).single();
     if (chapter) document.getElementById('chapterTitle').textContent = chapter.title;
+    checkBookmark();
 
     const { data: note } = await supabaseClient.from('notes').select('*').eq('chapter_id', chapterId).eq('language', 'en').single();
     const noteDiv = document.getElementById('noteContent');
@@ -207,6 +209,23 @@
     if (!session) { window.location.href = "login.html"; return; }
     await supabaseClient.from('user_unlocked_notes').upsert({ user_id: session.user.id, professional_note_id: noteId, unlocked_at: new Date().toISOString() });
     location.reload();
+  }
+
+  async function checkBookmark(){
+    const { data: { session } } = await supabaseClient.auth.getSession();
+    if (!session) return;
+    const { data } = await supabaseClient.from('bookmarks').select('*').eq('user_id', session.user.id).eq('chapter_id', chapterId).maybeSingle();
+    document.getElementById('bookmarkBtn').style.background = data ? 'var(--gold)' : 'rgba(255,255,255,0.1)';
+    document.getElementById('bookmarkBtn').style.color = data ? 'var(--navy)' : 'white';
+  }
+
+  async function toggleBookmark(){
+    const { data: { session } } = await supabaseClient.auth.getSession();
+    if (!session) { window.location.href = "login.html"; return; }
+    const { data } = await supabaseClient.from('bookmarks').select('*').eq('user_id', session.user.id).eq('chapter_id', chapterId).maybeSingle();
+    if (data) await supabaseClient.from('bookmarks').delete().eq('user_id', session.user.id).eq('chapter_id', chapterId);
+    else await supabaseClient.from('bookmarks').insert({ user_id: session.user.id, chapter_id: chapterId });
+    checkBookmark();
   }
 </script>
 </body>
