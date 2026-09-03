@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Notes Wallah — My Unlocked Notes</title>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:wght@600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="supabase-config.js"></script>
+<style>
+  :root{ --navy:#132242; --gold:#E8A33D; --cream:#F7F5F0; --grey:#6B7280; --shadow:0 4px 16px rgba(19,34,66,0.08); }
+  *{box-sizing:border-box; margin:0; padding:0;}
+  body{ font-family:'Inter',sans-serif; background:var(--cream); display:flex; justify-content:center; }
+  .phone{ width:100%; max-width:430px; min-height:100vh; }
+  .topbar{ background:var(--navy); color:white; padding:16px 20px 20px; border-radius:0 0 24px 24px; display:flex; align-items:center; gap:14px; }
+  .back-btn{ width:36px; height:36px; border-radius:50%; background:rgba(255,255,255,0.1); display:flex; align-items:center; justify-content:center; cursor:pointer; text-decoration:none; color:white; }
+  .topbar h1{ font-family:'Fraunces',serif; font-size:18px; }
+  .content{ padding:18px; }
+  .note-card{ background:white; border-radius:14px; box-shadow:var(--shadow); padding:14px 16px; display:flex; align-items:center; gap:12px; margin-bottom:10px; text-decoration:none; color:#1B1B1B; }
+  .note-icon{ width:42px; height:42px; border-radius:12px; background:var(--cream); display:flex; align-items:center; justify-content:center; font-size:18px; }
+  .note-info h4{ font-size:13.5px; font-weight:600; }
+  .empty{ text-align:center; padding:60px 20px; color:var(--grey); font-size:13px; }
+</style>
+</head>
+<body>
+<div class="phone">
+  <div class="topbar"><a href="profile.html" class="back-btn">←</a><h1>My Unlocked Notes</h1></div>
+  <div class="content" id="list"><div class="empty">Loading...</div></div>
+</div>
+<script>
+  (async () => {
+    const { data: { session } } = await supabaseClient.auth.getSession();
+    if (!session) { window.location.href = "login.html"; return; }
+    const { data: pro } = await supabaseClient.from('user_unlocked_notes').select('*, professional_notes(title, chapter_id, pdf_url)').eq('user_id', session.user.id);
+    const list = document.getElementById('list');
+    if (!pro || pro.length === 0) { list.innerHTML = '<div class="empty">No professional notes unlocked yet. Earn XP and unlock some from any chapter!</div>'; return; }
+    list.innerHTML = '';
+    pro.forEach(p => {
+      const a = document.createElement('a');
+      a.href = `dynamic-note.html?chapter_id=${p.professional_notes.chapter_id}`;
+      a.className = 'note-card';
+      a.innerHTML = `<div class="note-icon">📄</div><div class="note-info"><h4>${p.professional_notes.title}</h4></div>`;
+      list.appendChild(a);
+    });
+  })();
+</script>
+</body>
+</html>

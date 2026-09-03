@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Notes Wallah — Weekly Challenge</title>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:wght@600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="supabase-config.js"></script>
+<style>
+  :root{ --navy:#132242; --gold:#E8A33D; --cream:#F7F5F0; --grey:#6B7280; --green:#2E8B57; --red:#C0392B; --shadow:0 4px 16px rgba(19,34,66,0.08); }
+  *{box-sizing:border-box; margin:0; padding:0;}
+  body{ font-family:'Inter',sans-serif; background:var(--cream); display:flex; justify-content:center; }
+  .phone{ width:100%; max-width:430px; min-height:100vh; padding-bottom:30px; }
+  h1,h2{ font-family:'Fraunces',serif; }
+  .topbar{ background:var(--navy); color:white; padding:16px 20px 20px; border-radius:0 0 24px 24px; display:flex; align-items:center; gap:14px; }
+  .back-btn{ width:36px; height:36px; border-radius:50%; background:rgba(255,255,255,0.1); display:flex; align-items:center; justify-content:center; cursor:pointer; text-decoration:none; color:white; }
+  .content{ padding:20px; }
+  .card{ background:white; border-radius:16px; box-shadow:var(--shadow); padding:20px; text-align:center; }
+  .card h2{ color:var(--navy); font-size:18px; margin:10px 0 6px; }
+  .card p{ color:var(--grey); font-size:13px; line-height:1.6; }
+  .xp-pill{ display:inline-block; background:var(--gold); color:var(--navy); font-weight:700; font-size:12px; padding:5px 12px; border-radius:14px; margin-top:10px; }
+  .btn{ width:100%; background:var(--navy); color:white; border:none; padding:14px; border-radius:14px; font-weight:700; font-size:14px; margin-top:18px; cursor:pointer; }
+  .q-card{ background:white; border-radius:16px; box-shadow:var(--shadow); padding:18px; margin-bottom:14px; }
+  .q-progress{ font-size:11.5px; color:var(--grey); font-weight:600; margin-bottom:8px; }
+  .q-text{ font-size:14.5px; font-weight:600; margin-bottom:14px; line-height:1.5; }
+  .option{ display:flex; align-items:center; gap:10px; padding:12px 14px; border-radius:12px; border:1.5px solid #E8E6E0; margin-bottom:8px; cursor:pointer; font-size:13.5px; }
+  .option.selected{ border-color:var(--navy); background:#F0F3FA; }
+  .opt-letter{ width:24px; height:24px; border-radius:50%; background:var(--cream); display:flex; align-items:center; justify-content:center; font-size:11px; font-weight:700; color:var(--navy); flex-shrink:0; }
+  .option.selected .opt-letter{ background:var(--navy); color:white; }
+  .timer{ background:var(--navy); color:white; padding:6px 14px; border-radius:16px; font-size:12.5px; font-weight:700; display:inline-block; margin-bottom:14px; }
+  .submit-btn{ width:100%; background:var(--green); color:white; border:none; padding:14px; border-radius:14px; font-weight:700; font-size:14px; margin-top:6px; cursor:pointer; }
+  .result-badge{ font-size:14px; font-weight:700; padding:8px 18px; border-radius:16px; display:inline-block; margin:12px 0; }
+  .result-badge.pass{ background:#E4F3EA; color:var(--green); }
+  .result-badge.fail{ background:#FBEAE8; color:var(--red); }
+</style>
+</head>
+<body>
+<div class="phone">
+  <div class="topbar"><a href="index.html" class="back-btn">←</a><h1 style="font-size:18px;">Weekly Challenge</h1></div>
+  <div class="content" id="app"><div class="card"><p>Loading this week's challenge...</p></div></div>
+</div>
+
+<script>
+  let session, questions = [], current = 0, answers = [], timeLeft = 30, timerInterval;
+
+  async function init(){
+    const s = await supabaseClient.auth.getSession();
+    session = s.data.session;
+    if (!session) { window.location.href = "login.html"; return; }
+
+    const weekStart = getWeekStart();
+    const { data: existing } = await supabaseClient.from('weekly_challenges').select('*').eq('user_id', session.user.id).eq('week_start', weekStart).maybeSingle();
+    if (existing) { renderAlreadyDone(existing); return; }
+
+    const { data: profile } = await supabaseClient.from('profiles').select('*').eq('id', session.user.id).single();
+    const classBoard = `Class ${profile.class_selected} ${profile.board}`;
+    const { data: subjects } = await supabaseClient.from('subjects').select('id').eq('class_board', classBoard);
+    if (!subjects || subjects.length === 0) { renderNoContent(); return; }
+    const subjectIds = subjects.map(s => s.id);
+
+    const { data: qs } = await supabaseClient.from('questions').select('*, chapters(subject_id)').limit(200);
+    const filtered = (qs || []).filter(q => subjectIds.includes(q.chapters?.subject_id));
+    if (filtered.length < 5) { renderNoContent(); return; }
+
+    // Shuffle and take up to 30
+    const shuffled = filtered.sort(() => Math.random() - 0.5);
+    questions = shuffled.slice(0, Math.min(30, shuffled.length));
+    answers = new Array(questions.length).fill(null);
+    renderIntro();
+  }
+
+  function getWeekStart(){
+    const d = new Date();
+    const day = d.getDay();
+    const diff = d.getDate() - day + (day === 0 ? -6 : 1);
+    const monday = new Date(d.setDate(diff));
+    return monday.toISOString().slice(0,10);
+  }
+
+  function renderNoContent(){
+    document.getElementById('app').innerHTML = `<div class="card"><h2>Coming Soon</h2><p>Not enough questions available yet for a full weekly challenge. Check back once more content is added!</p></div>`;
+  }
+
+  function renderAlreadyDone(rec){
+    document.getElementById('app').innerHTML = `
+      <div class="card">
+        <h2>This Week — Done ✓</h2>
+        <p>You scored ${rec.score}/${rec.total} this week.</p>
+        <div class="result-badge ${rec.passed?'pass':'fail'}">${rec.passed ? '✓ Passed — +50 XP earned' : '✗ Not passed'}</div>
+        <p>New challenge available next Monday!</p>
+      </div>`;
+  }
+
+  function renderIntro(){
+    document.getElementById('app').innerHTML = `
+      <div class="card">
+        <h2>Weekly Recap Challenge</h2>
+        <p>${questions.length} questions from across your syllabus · One attempt per week</p>
+        <div class="xp-pill">+50 XP on passing (75%+)</div>
+        <button class="btn" onclick="startQuiz()">Start Challenge</button>
+      </div>`;
+  }
+
+  function startQuiz(){ current = 0; renderQuestion(); }
+
+  function renderQuestion(){
+    clearInterval(timerInterval);
+    timeLeft = 30;
+    const q = questions[current];
+    document.getElementById('app').innerHTML = `
+      <div class="timer" id="timerBox">⏱ ${timeLeft}s</div>
+      <div class="q-card">
+        <div class="q-progress">Question ${current+1} of ${questions.length}</div>
+        <div class="q-text">${q.question_text}</div>
+        <div id="opts"></div>
+      </div>
+      <button class="submit-btn" onclick="nextQuestion()">${current === questions.length-1 ? 'Finish' : 'Next'}</button>`;
+    const opts = [q.option_a, q.option_b, q.option_c, q.option_d];
+    const optsDiv = document.getElementById('opts');
+    opts.forEach((opt, i) => {
+      const div = document.createElement('div');
+      div.className = 'option' + (answers[current] === i ? ' selected' : '');
+      div.innerHTML = `<div class="opt-letter">${String.fromCharCode(65+i)}</div><div>${opt}</div>`;
+      div.onclick = () => { answers[current] = i; renderQuestion(); };
+      optsDiv.appendChild(div);
+    });
+    timerInterval = setInterval(() => {
+      timeLeft--;
+      const box = document.getElementById('timerBox');
+      if (box) box.textContent = `⏱ ${timeLeft}s`;
+      if (timeLeft <= 0) { clearInterval(timerInterval); nextQuestion(); }
+    }, 1000);
+  }
+
+  function nextQuestion(){
+    clearInterval(timerInterval);
+    if (current < questions.length - 1) { current++; renderQuestion(); }
+    else finishQuiz();
+  }
+
+  async function finishQuiz(){
+    let score = 0;
+    questions.forEach((q, i) => {
+      if (answers[i] === null) return;
+      if (answers[i] === q.correct_option) score += 1;
+      else score -= 0.5;
+    });
+    score = Math.max(0, Math.round(score));
+    const total = questions.length;
+    const passed = (score / total) >= 0.75;
+    const weekStart = getWeekStart();
+
+    await supabaseClient.from('weekly_challenges').insert({ user_id: session.user.id, week_start: weekStart, score, total, passed });
+
+    if (passed) {
+      const { data: profile } = await supabaseClient.from('profiles').select('total_xp').eq('id', session.user.id).single();
+      await supabaseClient.from('profiles').update({ total_xp: (profile?.total_xp||0) + 50 }).eq('id', session.user.id);
+      await supabaseClient.from('xp_transactions').insert({ user_id: session.user.id, amount: 50, type: 'weekly_challenge_pass' });
+    }
+
+    document.getElementById('app').innerHTML = `
+      <div class="card">
+        <h2>Challenge Complete!</h2>
+        <p>You scored ${score}/${total}</p>
+        <div class="result-badge ${passed?'pass':'fail'}">${passed ? '✓ Passed — +50 XP earned!' : '✗ Not passed — try next week'}</div>
+      </div>`;
+  }
+
+  init();
+</script>
+</body>
+</html>

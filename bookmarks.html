@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Notes Wallah — Bookmarks</title>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:wght@600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="supabase-config.js"></script>
+<style>
+  :root{ --navy:#132242; --gold:#E8A33D; --cream:#F7F5F0; --grey:#6B7280; --shadow:0 4px 16px rgba(19,34,66,0.08); }
+  *{box-sizing:border-box; margin:0; padding:0;}
+  body{ font-family:'Inter',sans-serif; background:var(--cream); display:flex; justify-content:center; }
+  .phone{ width:100%; max-width:430px; min-height:100vh; }
+  .topbar{ background:var(--navy); color:white; padding:16px 20px 20px; border-radius:0 0 24px 24px; display:flex; align-items:center; gap:14px; }
+  .back-btn{ width:36px; height:36px; border-radius:50%; background:rgba(255,255,255,0.1); display:flex; align-items:center; justify-content:center; cursor:pointer; text-decoration:none; color:white; }
+  .topbar h1{ font-family:'Fraunces',serif; font-size:18px; }
+  .content{ padding:18px; }
+  .ch-card{ background:white; border-radius:14px; box-shadow:var(--shadow); padding:14px 16px; margin-bottom:10px; text-decoration:none; color:#1B1B1B; display:block; font-weight:600; font-size:14px; }
+  .empty{ text-align:center; padding:60px 20px; color:var(--grey); font-size:13px; }
+</style>
+</head>
+<body>
+<div class="phone">
+  <div class="topbar"><a href="profile.html" class="back-btn">←</a><h1>Bookmarked Chapters</h1></div>
+  <div class="content" id="list"><div class="empty">Loading...</div></div>
+</div>
+<script>
+  (async () => {
+    const { data: { session } } = await supabaseClient.auth.getSession();
+    if (!session) { window.location.href = "login.html"; return; }
+    const { data: marks } = await supabaseClient.from('bookmarks').select('*, chapters(id, title)').eq('user_id', session.user.id);
+    const list = document.getElementById('list');
+    if (!marks || marks.length === 0) { list.innerHTML = '<div class="empty">No bookmarks yet. Tap the 🔖 icon on any chapter to save it here.</div>'; return; }
+    list.innerHTML = '';
+    marks.forEach(m => {
+      const a = document.createElement('a');
+      a.href = `dynamic-note.html?chapter_id=${m.chapters.id}`;
+      a.className = 'ch-card';
+      a.textContent = m.chapters.title;
+      list.appendChild(a);
+    });
+  })();
+</script>
+</body>
+</html>
