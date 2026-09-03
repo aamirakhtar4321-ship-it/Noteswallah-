@@ -130,18 +130,15 @@
         <div class="cert-subtitle">Pair of Linear Equations</div>
 
         <div class="cert-presented">This certifies that</div>
-        <div class="cert-name">Aman Kumar</div>
-        <div class="cert-desc">
-          has successfully completed the <b>Pair of Linear Equations in Two Variables</b>
-          chapter test in Mathematics, Class 10, scoring <b>13/15 (87%)</b>.
-        </div>
+        <div class="cert-name" id="certStudentName">Student</div>
+        <div class="cert-desc" id="certDesc">Loading...</div>
 
-        <div class="cert-grade">★ Very Good</div>
+        <div class="cert-grade" id="certGrade">★ —</div>
 
         <div class="cert-footer">
           <div class="cert-date">
             <div class="lbl">Date</div>
-            <div class="val" id="certDate">29 Aug 2026</div>
+            <div class="val" id="certDate2">—</div>
           </div>
           <div class="cert-sign">
             <div class="sig">Notes Wallah</div>
@@ -149,7 +146,7 @@
           </div>
         </div>
 
-        <div class="cert-id">Certificate ID: NW-MATH03-AK2026-08291402</div>
+        <div class="cert-id" id="certIdLine">Certificate ID: —</div>
       </div>
     </div>
 
@@ -163,6 +160,33 @@
     </div>
   </div>
 </div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="supabase-config.js"></script>
+<script>
+  (async () => {
+    const params = new URLSearchParams(window.location.search);
+    const chapter = params.get('chapter') || 'Chapter Test';
+    const score = parseInt(params.get('score') || 0);
+    const total = parseInt(params.get('total') || 1);
+    const date = params.get('date') || new Date().toISOString().slice(0,10);
+    const percent = Math.round((score/total)*100);
+    const grade = percent >= 90 ? 'Excellent' : percent >= 75 ? 'Very Good' : 'Good';
+
+    const { data: { session } } = await supabaseClient.auth.getSession();
+    let name = 'Student';
+    if (session) {
+      const { data: profile } = await supabaseClient.from('profiles').select('name').eq('id', session.user.id).single();
+      name = profile?.name || 'Student';
+    }
+
+    document.getElementById('certStudentName').textContent = name;
+    document.getElementById('certDesc').innerHTML = `has successfully completed the <b>${chapter}</b> test, scoring <b>${score}/${total} (${percent}%)</b>.`;
+    document.getElementById('certGrade').textContent = `★ ${grade}`;
+    document.getElementById('certDate2').textContent = new Date(date).toLocaleDateString('en-IN', { day:'numeric', month:'short', year:'numeric' });
+    document.getElementById('certIdLine').textContent = `Certificate ID: NW-${(chapter||'').slice(0,4).toUpperCase()}-${session?.user.id.slice(0,6) || 'XXXXXX'}-${date.replace(/-/g,'')}`;
+  })();
+</script>
 
 </body>
 </html>
