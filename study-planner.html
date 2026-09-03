@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Notes Wallah — Study Planner</title>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:wght@600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="supabase-config.js"></script>
+<style>
+  :root{ --navy:#132242; --gold:#E8A33D; --cream:#F7F5F0; --grey:#6B7280; --green:#2E8B57; --shadow:0 4px 16px rgba(19,34,66,0.08); }
+  *{box-sizing:border-box; margin:0; padding:0;}
+  body{ font-family:'Inter',sans-serif; background:var(--cream); display:flex; justify-content:center; }
+  .phone{ width:100%; max-width:430px; min-height:100vh; padding-bottom:30px; }
+  h1,h2{ font-family:'Fraunces',serif; }
+  .topbar{ background:var(--navy); color:white; padding:16px 20px 20px; border-radius:0 0 24px 24px; display:flex; align-items:center; gap:14px; }
+  .back-btn{ width:36px; height:36px; border-radius:50%; background:rgba(255,255,255,0.1); display:flex; align-items:center; justify-content:center; cursor:pointer; text-decoration:none; color:white; }
+  .content{ padding:20px; }
+  .card{ background:white; border-radius:16px; box-shadow:var(--shadow); padding:20px; }
+  label{ font-size:12.5px; font-weight:600; color:var(--navy); display:block; margin-bottom:8px; }
+  input[type="date"]{ width:100%; padding:13px; border-radius:12px; border:1.5px solid #E3E1DB; font-size:14px; }
+  .btn{ width:100%; background:var(--navy); color:white; border:none; padding:14px; border-radius:14px; font-weight:700; font-size:14px; margin-top:16px; cursor:pointer; }
+  .countdown-card{ background:linear-gradient(135deg,var(--navy),#1D3560); color:white; border-radius:16px; padding:24px; text-align:center; margin-bottom:16px; }
+  .countdown-num{ font-size:40px; font-weight:700; font-family:'Fraunces'; }
+  .countdown-label{ font-size:12px; opacity:0.85; margin-top:4px; }
+  .plan-row{ background:white; border-radius:12px; box-shadow:var(--shadow); padding:14px; margin-bottom:8px; display:flex; justify-content:space-between; align-items:center; }
+  .plan-row .day{ font-weight:700; color:var(--navy); font-size:13px; }
+  .plan-row .task{ font-size:12px; color:var(--grey); }
+</style>
+</head>
+<body>
+<div class="phone">
+  <div class="topbar"><a href="index.html" class="back-btn">←</a><h1 style="font-size:18px;">Study Planner</h1></div>
+  <div class="content" id="app">
+    <div class="card">
+      <label>When is your exam?</label>
+      <input type="date" id="examDate">
+      <button class="btn" onclick="savePlan()">Set Exam Date</button>
+    </div>
+  </div>
+</div>
+<script>
+  (async () => {
+    const { data: { session } } = await supabaseClient.auth.getSession();
+    if (!session) { window.location.href = "login.html"; return; }
+    const { data: plan } = await supabaseClient.from('study_plans').select('*').eq('user_id', session.user.id).order('created_at', { ascending: false }).limit(1).maybeSingle();
+    if (plan) renderCountdown(plan.exam_date);
+  })();
+
+  async function savePlan(){
+    const date = document.getElementById('examDate').value;
+    if (!date) { alert('Please pick a date'); return; }
+    const { data: { session } } = await supabaseClient.auth.getSession();
+    await supabaseClient.from('study_plans').insert({ user_id: session.user.id, exam_date: date });
+    renderCountdown(date);
+  }
+
+  function renderCountdown(dateStr){
+    const target = new Date(dateStr);
+    const now = new Date();
+    const days = Math.max(0, Math.ceil((target - now) / (1000*60*60*24)));
+    document.getElementById('app').innerHTML = `
+      <div class="countdown-card">
+        <div class="countdown-num">${days}</div>
+        <div class="countdown-label">days left until your exam</div>
+      </div>
+      <div class="plan-row"><div class="day">Daily</div><div class="task">Complete Daily Challenge (+10 XP)</div></div>
+      <div class="plan-row"><div class="day">Weekly</div><div class="task">Complete Weekly Recap Test (+50 XP)</div></div>
+      <div class="plan-row"><div class="day">This week</div><div class="task">Revise 2-3 chapters from Notes Library</div></div>
+      <button class="btn" style="background:white; color:var(--navy); box-shadow:0 4px 16px rgba(19,34,66,0.08); margin-top:12px;" onclick="location.reload()">Change Date</button>
+    `;
+  }
+</script>
+</body>
+</html>
