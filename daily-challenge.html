@@ -60,7 +60,7 @@
 </div>
 
 <script>
-  let session, chapter, questions = [], current = 0, answers = [], timeLeft = 20, timerInterval;
+  let session, chapter, questions = [], current = 0, answers = [], timeLeft = 20, timerInterval, quizStartTime = 0;
 
   async function init(){
     const s = await supabaseClient.auth.getSession();
@@ -125,6 +125,7 @@
 
   function startQuiz(){
     current = 0;
+    quizStartTime = Date.now();
     renderQuestion();
   }
 
@@ -178,6 +179,12 @@
     const today = new Date().toISOString().slice(0,10);
 
     await supabaseClient.from('daily_challenges').insert({ user_id: session.user.id, chapter_id: chapter.id, challenge_date: today, score, total, passed });
+
+    const secondsTaken = (Date.now() - quizStartTime) / 1000;
+    const avgPerQuestion = secondsTaken / total;
+    if (avgPerQuestion < 2.5) {
+      await supabaseClient.from('fraud_flags').insert({ user_id: session.user.id, flag_type: 'fast_completion', details: `Avg ${avgPerQuestion.toFixed(1)}s/question on daily challenge` });
+    }
 
     if (passed) {
       const { data: profile } = await supabaseClient.from('profiles').select('total_xp').eq('id', session.user.id).single();
