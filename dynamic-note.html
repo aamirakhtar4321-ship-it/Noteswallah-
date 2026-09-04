@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+    <!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
@@ -69,18 +69,8 @@
     <div class="back-btn" id="bookmarkBtn" onclick="toggleBookmark()">🔖</div>
   </div>
 
-  <div class="tab-row">
-    <div class="tab-btn active" id="tabNormal" onclick="switchTab('normal')">📖 Normal Notes</div>
-    <div class="tab-btn" id="tabPro" onclick="switchTab('pro')">📄 Pro Notes</div>
-  </div>
-
-  <div class="tab-panel show" id="panelNormal">
-    <div style="margin:14px 18px 0; background:#EEE; color:#999; text-align:center; font-size:10.5px; padding:8px; border-radius:8px;">📢 Banner Ad Space</div>
-    <div class="note-body" id="noteContent" style="user-select:none;"><p>Loading note content...</p></div>
-    <div class="no-download-note">🔒 View-only inside the app — cannot be downloaded</div>
-  </div>
-
-  <div class="tab-panel" id="panelPro"></div>
+  <div style="margin:14px 18px 0; background:#EEE; color:#999; text-align:center; font-size:10.5px; padding:8px; border-radius:8px;">📢 Banner Ad Space</div>
+  <div id="panelPro"></div>
 <div class="bottom-nav">
   <a href="index.html" class="nav-item">
     <svg class="nav-icon" width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><path d="M9 22V12h6v10"/></svg>Home</a>
@@ -100,13 +90,6 @@
   const chapterId = params.get('chapter_id');
   const MAY_1_MONTH = 4; // 0-indexed: May = 4
 
-  function switchTab(tab){
-    document.getElementById('tabNormal').classList.toggle('active', tab === 'normal');
-    document.getElementById('tabPro').classList.toggle('active', tab === 'pro');
-    document.getElementById('panelNormal').classList.toggle('show', tab === 'normal');
-    document.getElementById('panelPro').classList.toggle('show', tab === 'pro');
-  }
-
   function isExpiredByAnnualLock(unlockedAtStr){
     const unlockedAt = new Date(unlockedAtStr);
     const now = new Date();
@@ -121,10 +104,6 @@
     const { data: chapter } = await supabaseClient.from('chapters').select('*').eq('id', chapterId).single();
     if (chapter) document.getElementById('chapterTitle').textContent = chapter.title;
     checkBookmark();
-
-    const { data: note } = await supabaseClient.from('notes').select('*').eq('chapter_id', chapterId).eq('language', 'en').single();
-    const noteDiv = document.getElementById('noteContent');
-    noteDiv.innerHTML = note && note.content ? `<p>${note.content}</p>` : '<div class="empty">No notes added yet for this chapter. Check back soon!</div>';
 
     const { data: proNotes } = await supabaseClient.from('professional_notes').select('*').eq('chapter_id', chapterId);
     const proArea = document.getElementById('panelPro');
