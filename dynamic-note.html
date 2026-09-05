@@ -1,4 +1,4 @@
-    <!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
@@ -69,13 +69,18 @@
     <div class="back-btn" id="bookmarkBtn" onclick="toggleBookmark()">🔖</div>
   </div>
 
+  <div class="tab-row">
+    <div class="tab-btn active" id="tabEbook" onclick="switchTab('ebook')">📖 E-book</div>
+    <div class="tab-btn" id="tabPro" onclick="switchTab('pro')">📄 Pro Notes</div>
+  </div>
   <div style="margin:14px 18px 0; background:#EEE; color:#999; text-align:center; font-size:10.5px; padding:8px; border-radius:8px;">📢 Banner Ad Space</div>
-  <div id="panelPro"></div>
+  <div class="tab-panel show" id="panelEbook"></div>
+  <div class="tab-panel" id="panelPro"></div>
 <div class="bottom-nav">
   <a href="index.html" class="nav-item">
     <svg class="nav-icon" width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><path d="M9 22V12h6v10"/></svg>Home</a>
   <a href="subjects.html" class="nav-item">
-    <svg class="nav-icon" width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>Notes</a>
+    <svg class="nav-icon" width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>Subject</a>
   <a href="test-start.html" class="nav-item">
     <svg class="nav-icon" width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>Tests</a>
   <a href="doubts.html" class="nav-item">
@@ -98,6 +103,31 @@
     if (now < cycleMay1) cycleMay1.setFullYear(cycleMay1.getFullYear() - 1); // if before May 1 this year, use last year's May 1 as cycle start
     return unlockedAt < cycleMay1;
   }
+
+  function switchTab(tab){
+    document.getElementById('tabEbook').classList.toggle('active', tab === 'ebook');
+    document.getElementById('tabPro').classList.toggle('active', tab === 'pro');
+    document.getElementById('panelEbook').classList.toggle('show', tab === 'ebook');
+    document.getElementById('panelPro').classList.toggle('show', tab === 'pro');
+  }
+
+  (async () => {
+    const { data: ebookRows } = await supabaseClient.from('ebooks').select('*').eq('chapter_id', chapterId);
+    const ebookArea = document.getElementById('panelEbook');
+    if (!ebookRows || ebookRows.length === 0) {
+      ebookArea.innerHTML = '<div class="empty" style="margin:14px 18px;">No E-book added yet for this chapter.</div>';
+    } else {
+      ebookArea.innerHTML = '';
+      ebookRows.forEach(eb => {
+        const card = document.createElement('div');
+        card.className = 'pro-locked';
+        card.style.cssText = 'margin:14px 18px; background:linear-gradient(135deg,#1B5E3A,#2E8B57);';
+        card.innerHTML = `<div class="lock-icon">📖</div><h3>${eb.title}</h3><p>${eb.page_count || '?'} pages · Free to read</p>
+          <button class="unlock-btn" style="background:white; color:#1B5E3A;" onclick="openPdf('${eb.pdf_url}', '${eb.title}')">Open E-book</button>`;
+        ebookArea.appendChild(card);
+      });
+    }
+  })();
 
   (async () => {
     if (!chapterId) return;
