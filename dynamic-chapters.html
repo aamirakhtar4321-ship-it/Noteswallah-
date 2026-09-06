@@ -102,8 +102,7 @@
       const a = document.createElement('div');
       a.className = 'chapter-card';
       a.style.cursor = 'pointer';
-      a.innerHTML = `<div class="ch-num">${num}</div><div class="ch-info"><h4>${ch.title}</h4></div>
-        <a href="test-start.html?chapter_id=${ch.id}" style="text-decoration:none; font-size:10px; font-weight:700; background:#F6D9A6; color:#8A5A00; padding:5px 10px; border-radius:8px; white-space:nowrap;" onclick="event.stopPropagation();">Take Test</a>`;
+      a.innerHTML = `<div class="ch-num">${num}</div><div class="ch-info"><h4>${ch.title}</h4></div>`;
       a.onclick = () => { window.location.href = `dynamic-note.html?chapter_id=${ch.id}`; };
       list.appendChild(a);
     });
