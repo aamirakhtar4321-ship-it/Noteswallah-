@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Notes Wallah — Create Test</title>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:wght@600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="supabase-config.js"></script>
+<style>
+  :root{ --navy:#132242; --gold:#E8A33D; --cream:#F7F5F0; --grey:#6B7280; --green:#2E8B57; --shadow:0 4px 16px rgba(19,34,66,0.08); }
+  *{box-sizing:border-box; margin:0; padding:0;}
+  body{ font-family:'Inter',sans-serif; background:var(--cream); display:flex; justify-content:center; }
+  .phone{ width:100%; max-width:430px; min-height:100vh; padding-bottom:100px; }
+  h1,h2{ font-family:'Fraunces',serif; }
+  .topbar{ background:var(--navy); color:white; padding:16px 20px 20px; border-radius:0 0 24px 24px; display:flex; align-items:center; gap:14px; }
+  .back-btn{ width:36px; height:36px; border-radius:50%; background:rgba(255,255,255,0.1); display:flex; align-items:center; justify-content:center; cursor:pointer; text-decoration:none; color:white; }
+  .content{ padding:18px; }
+  .card{ background:white; border-radius:16px; box-shadow:var(--shadow); padding:18px; margin-bottom:14px; }
+  label{ font-size:12.5px; font-weight:700; color:var(--navy); display:block; margin-bottom:8px; }
+  select{ width:100%; padding:12px; border-radius:12px; border:1.5px solid #E3E1DB; font-size:14px; background:white; margin-bottom:6px; }
+  .mode-row{ display:flex; gap:8px; margin-bottom:6px; }
+  .mode-btn{ flex:1; padding:10px; border-radius:10px; text-align:center; font-size:12.5px; font-weight:700; background:var(--cream); color:var(--navy); cursor:pointer; border:1.5px solid transparent; }
+  .mode-btn.active{ border-color:var(--gold); background:#FFF8EC; }
+  .chapter-check{ display:flex; align-items:center; gap:10px; padding:10px; border-radius:10px; background:var(--cream); margin-bottom:6px; font-size:13px; }
+  .chapter-check input{ width:18px; height:18px; }
+  .qty-row{ display:flex; justify-content:space-between; align-items:center; padding:10px; background:var(--cream); border-radius:10px; margin-top:6px; }
+  .qty-row .num{ font-weight:700; color:var(--navy); font-size:15px; }
+  input[type="number"]{ width:100%; padding:12px; border-radius:12px; border:1.5px solid #E3E1DB; font-size:14px; }
+  .toggle-row{ display:flex; justify-content:space-between; align-items:center; }
+  .toggle-switch{ width:44px; height:24px; border-radius:14px; background:#DDD; position:relative; cursor:pointer; }
+  .toggle-switch.on{ background:var(--navy); }
+  .toggle-knob{ width:18px; height:18px; border-radius:50%; background:white; position:absolute; top:3px; left:3px; transition:left .2s; }
+  .toggle-switch.on .toggle-knob{ left:23px; }
+  .btn{ width:100%; background:var(--navy); color:white; border:none; padding:14px; border-radius:14px; font-weight:700; font-size:14px; cursor:pointer; }
+  .btn:disabled{ opacity:0.5; }
+</style>
+</head>
+<body>
+<div class="phone">
+  <div class="topbar"><a href="index.html" class="back-btn">←</a><h1 style="font-size:18px;">Create Test</h1></div>
+  <div class="content">
+    <div class="card">
+      <label>Test Type</label>
+      <div class="mode-row">
+        <div class="mode-btn active" id="modeChapter" onclick="setMode('chapter')">Chapter-wise</div>
+        <div class="mode-btn" id="modeFull" onclick="setMode('full')">Full Syllabus</div>
+      </div>
+    </div>
+
+    <div class="card" id="subjectCard">
+      <label>Subject</label>
+      <select id="subjectSelect" onchange="loadChapters()"><option>Loading...</option></select>
+    </div>
+
+    <div class="card" id="chapterCard">
+      <label>Select Chapter(s)</label>
+      <div id="chapterList"><p style="font-size:12px; color:var(--grey);">Select a subject first</p></div>
+      
+    </div>
+
+    <div class="card">
+      <label>Duration (minutes)</label>
+      <input type="number" id="durationInput" value="30" min="5" max="180">
+    </div>
+
+    <div class="card">
+      <div class="toggle-row">
+        <label style="margin:0;">Negative Marking</label>
+        <div class="toggle-switch" id="negToggle" onclick="toggleNeg()"><div class="toggle-knob"></div></div>
+      </div>
+      <div id="negValueRow" style="display:none; margin-top:10px;">
+        <label>Marks deducted per wrong answer</label>
+        <input type="number" id="negValue" value="0.25" step="0.25" min="0">
+      </div>
+    </div>
+
+    <button class="btn" id="startBtn" onclick="startTest()">Start Test</button>
+  </div>
+</div>
+
+<script>
+  let mode = 'chapter';
+  let negOn = false;
+  let allSubjects = [];
+
+  function setMode(m){
+    mode = m;
+    document.getElementById('modeChapter').classList.toggle('active', m==='chapter');
+    document.getElementById('modeFull').classList.toggle('active', m==='full');
+    document.getElementById('chapterCard').style.display = m==='chapter' ? 'block' : 'none';
+    if (m==='full') loadFullSyllabusCount();
+  }
+
+  function toggleNeg(){
+    negOn = !negOn;
+    document.getElementById('negToggle').classList.toggle('on', negOn);
+    document.getElementById('negValueRow').style.display = negOn ? 'block' : 'none';
+  }
+
+  (async () => {
+    const { data: { session } } = await supabaseClient.auth.getSession();
+    if (!session) { window.location.href = "login.html"; return; }
+    const { data: profile } = await supabaseClient.from('profiles').select('*').eq('id', session.user.id).single();
+    const classBoard = `Class ${profile.class_selected} ${profile.board}`;
+    const { data: subjects } = await supabaseClient.from('subjects').select('*').eq('class_board', classBoard);
+    allSubjects = subjects || [];
+    const sel = document.getElementById('subjectSelect');
+    sel.innerHTML = allSubjects.map(s => `<option value="${s.id}">${s.name}</option>`).join('');
+    if (allSubjects.length) loadChapters();
+  })();
+
+  async function loadChapters(){
+    const subjectId = document.getElementById('subjectSelect').value;
+    const { data: chapters } = await supabaseClient.from('chapters').select('*').eq('subject_id', subjectId).order('order_index');
+    const list = document.getElementById('chapterList');
+    if (!chapters || chapters.length === 0) { list.innerHTML = '<p style="font-size:12px; color:var(--grey);">No chapters found.</p>'; return; }
+    list.innerHTML = chapters.map(ch => `
+      <div class="chapter-check">
+        <input type="checkbox" value="${ch.id}" onchange="updateAvailable()">
+        <div>${ch.title}</div>
+      </div>`).join('');
+    updateAvailable();
+  }
+
+  async function updateAvailable(){
+    const checked = [...document.querySelectorAll('#chapterList input:checked')].map(el => el.value);
+    if (checked.length === 0) { document.getElementById('qtyAvailable').textContent = '0'; return; }
+    const { count } = await supabaseClient.from('questions').select('*', { count: 'exact', head: true }).in('chapter_id', checked);
+    const capped = getCapped(checked.length, count || 0);
+    // question count intentionally not shown to user
+  }
+
+  function getCapped(numChapters, available){
+    let cap = 100;
+    if (numChapters === 1) cap = 20;
+    else if (numChapters === 2) cap = 40;
+    else if (numChapters === 3) cap = 60;
+    else if (numChapters === 4) cap = 80;
+    return Math.min(cap, available);
+  }
+
+  async function loadFullSyllabusCount(){
+    const allChapterIds = [];
+    for (const s of allSubjects) {
+      const { data: chs } = await supabaseClient.from('chapters').select('id').eq('subject_id', s.id);
+      (chs||[]).forEach(c => allChapterIds.push(c.id));
+    }
+    const { count } = await supabaseClient.from('questions').select('*', { count: 'exact', head: true }).in('chapter_id', allChapterIds);
+    // question count intentionally not shown to user
+  }
+
+  async function startTest(){
+    let chapterIds = [];
+    if (mode === 'chapter') {
+      chapterIds = [...document.querySelectorAll('#chapterList input:checked')].map(el => el.value);
+      if (chapterIds.length === 0) { alert('Select at least one chapter'); return; }
+    } else {
+      for (const s of allSubjects) {
+        const { data: chs } = await supabaseClient.from('chapters').select('id').eq('subject_id', s.id);
+        (chs||[]).forEach(c => chapterIds.push(c.id));
+      }
+    }
+    const duration = parseInt(document.getElementById('durationInput').value) || 30;
+    const negValue = negOn ? parseFloat(document.getElementById('negValue').value) || 0.25 : 0;
+
+    localStorage.setItem('nw_testConfig', JSON.stringify({ chapterIds, duration, negValue, mode }));
+    window.location.href = 'live-test.html?configured=1';
+  }
+</script>
+</body>
+</html>
