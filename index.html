@@ -77,13 +77,6 @@
   .greeting p{ margin-top:4px; color:var(--gold-light); font-size:13.5px; }
 
   .content{ padding:18px 18px 0; }
-  .hero-progress{margin:0 0 14px;padding:16px;border-radius:18px;background:linear-gradient(135deg,var(--navy),var(--navy-light));color:white;box-shadow:0 8px 22px rgba(19,34,66,.14);position:relative;overflow:hidden}
-  .hero-progress::after{content:"";position:absolute;width:130px;height:130px;border-radius:50%;right:-45px;top:-55px;background:rgba(232,163,61,.16)}
-  .hero-progress-top{display:flex;justify-content:space-between;align-items:center;gap:12px;position:relative;z-index:1}
-  .hero-kicker{font-size:10px;text-transform:uppercase;letter-spacing:1px;opacity:.7;font-weight:700}
-  .hero-title{font-family:'Fraunces';font-size:18px;margin-top:3px}.hero-xp{font-size:20px;font-weight:800;color:var(--gold-light);white-space:nowrap}.hero-sub{font-size:11px;opacity:.72;margin-top:2px}
-  .hero-progress-bar{height:7px;background:rgba(255,255,255,.13);border-radius:10px;margin-top:13px;overflow:hidden;position:relative;z-index:1}.hero-progress-fill{height:100%;width:6%;background:var(--gold);border-radius:10px}
-  .quick-item{transition:transform .15s ease,box-shadow .15s ease}.quick-item:hover{transform:translateY(-2px);box-shadow:0 8px 20px rgba(19,34,66,.11)}.challenge-card{min-height:145px}
   .section-title{ font-size:15px; font-weight:700; color:var(--navy); margin:20px 2px 10px; display:flex; justify-content:space-between; align-items:center; }
 
   /* Streak */
@@ -198,7 +191,7 @@
         <div class="logo">Notes<span>Wallah</span></div>
       </div>
       <div class="topbar-icons">
-        <div class="xp-badge">⚡ <span id="xpAmount">0</span> XP</div>
+        <div class="xp-badge">⚡ <span id="xpAmount">140</span> XP</div>
         <a href="notifications.html" class="icon-btn" style="text-decoration:none; color:white; position:relative;">🔔<div class="dot" id="notifDot" style="display:none;"></div></a>
         <a href="profile.html" class="icon-btn" style="color:white; text-decoration:none;">👤</a>
       </div>
@@ -212,7 +205,6 @@
   <div class="content">
 
     <div style="background:#EEE; color:#999; text-align:center; font-size:10.5px; padding:8px; border-radius:8px; margin-bottom:12px;">📢 Home Banner Ad Space</div>
-    <div class="hero-progress"><div class="hero-progress-top"><div><div class="hero-kicker">Your learning progress</div><div class="hero-title">Keep the streak alive 🔥</div><div class="hero-sub" id="xpProgressText">Earn XP by studying and completing tests</div></div><div class="hero-xp"><span id="heroXp">0</span> XP</div></div><div class="hero-progress-bar"><div class="hero-progress-fill" id="heroXpFill"></div></div></div>
     <div class="streak-card">
       <div class="streak-left">
         <div class="flame">🔥</div>
@@ -221,14 +213,18 @@
           <div class="streak-label">Current streak</div>
         </div>
       </div>
-      <div class="streak-days" id="streakDots">
-        <div class="d"></div><div class="d"></div><div class="d"></div><div class="d"></div><div class="d"></div><div class="d"></div><div class="d"></div>
+      <div class="streak-days">
+        <div class="d on"></div><div class="d on"></div><div class="d on"></div>
+        <div class="d on"></div><div class="d on"></div><div class="d on"></div><div class="d"></div>
       </div>
     </div>
 
     <!-- QUICK ACCESS — moved up -->
     <div class="section-title">Quick Access</div>
     <div class="quick-grid">
+      <a href="subjects.html" class="quick-item" style="text-decoration:none; color:inherit; display:block;">
+        <div class="qi-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg></div><div class="qi-label">Notes</div>
+      </a>
       <a href="test-setup.html" class="quick-item" style="text-decoration:none; color:inherit; display:block;">
         <div class="qi-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg></div><div class="qi-label">Test Zone</div>
       </a>
@@ -284,140 +280,4 @@
 
     <div class="section-title">Professional Notes</div>
     <div class="teaser-card">
-      <div><h4>Unlock professional notes</h4><p>Use XP from challenges to unlock premium notes</p></div>
-      <div class="xp-pill" style="background:var(--gold); color:var(--navy);">50 XP</div>
-    </div>
-
-  </div>
-</div>
-
-<div class="bottom-nav">
-  <a href="index.html" class="nav-item active">
-    <svg class="nav-icon" width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><path d="M9 22V12h6v10"/></svg>Home</a>
-  <a href="subjects.html" class="nav-item">
-    <svg class="nav-icon" width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>Subject</a>
-  <a href="test-setup.html" class="nav-item">
-    <svg class="nav-icon" width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>Tests</a>
-  <a href="doubts.html" class="nav-item" data-nav="ai">
-    <svg class="nav-icon" width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="8" width="18" height="12" rx="2"/><circle cx="8.5" cy="14" r="1.2" fill="currentColor" stroke="none"/><circle cx="15.5" cy="14" r="1.2" fill="currentColor" stroke="none"/><path d="M12 8V4M8 4h8"/></svg>AI</a>
-  <a href="profile.html" class="nav-item">
-    <svg class="nav-icon" width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>Profile</a>
-</div>
-
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script src="supabase-config.js"></script>
-<script>
-  if (localStorage.getItem('nw_dark_mode') === '1') document.body.classList.add('dark');
-  if (localStorage.getItem('nw_splash_shown_ever')) {
-    document.getElementById('splash').style.display = 'none';
-  } else {
-    localStorage.setItem('nw_splash_shown_ever', '1');
-  }
-  const hour = new Date().getHours();
-  let greet = "Good morning";
-  if (hour >= 12 && hour < 17) greet = "Good afternoon";
-  else if (hour >= 17) greet = "Good evening";
-  document.getElementById('greetText').textContent = greet + ", Aman";
-
-  (async () => {
-    const { data: { session } } = await supabaseClient.auth.getSession();
-    if (!session) { window.location.href = "login.html"; return; }
-
-    const { data: profile } = await supabaseClient
-      .from('profiles')
-      .select('*')
-      .eq('id', session.user.id)
-      .single();
-
-    if (profile) {
-      const name = profile.name || "Student";
-      document.getElementById('greetText').textContent = greet + ", " + name;
-      document.getElementById('xpAmount').textContent = profile.total_xp || 0;
-      const classLine = document.getElementById('classLine');
-      if (classLine) {
-        classLine.textContent = (profile.class_selected ? "Class " + profile.class_selected + " · " : "") +
-          (profile.board || "") + (profile.medium ? " · " + profile.medium + " Medium" : "");
-      }
-    }
-
-    const { count: unreadCount } = await supabaseClient.from('notifications').select('*', { count: 'exact', head: true }).eq('user_id', session.user.id).eq('is_read', false);
-    if (unreadCount > 0) document.getElementById('notifDot').style.display = 'block';
-
-    const today = new Date().toISOString().slice(0,10);
-    const { data: dailyDone } = await supabaseClient.from('daily_challenges').select('*').eq('user_id', session.user.id).eq('challenge_date', today).maybeSingle();
-    if (!dailyDone) {
-      const { data: existingNotif } = await supabaseClient.from('notifications').select('*').eq('user_id', session.user.id).eq('type','daily').gte('created_at', today).maybeSingle();
-      if (!existingNotif) {
-        await supabaseClient.from('notifications').insert({ user_id: session.user.id, title: '📝 Daily Challenge Waiting!', body: 'Complete today\\'s challenge to earn 10 XP.', type: 'daily' });
-        document.getElementById('notifDot').style.display = 'block';
-      }
-    }
-
-    const { data: attempts } = await supabaseClient.from('test_attempts').select('*, chapters(title)').eq('user_id', session.user.id).order('created_at', { ascending: false }).limit(1);
-    if (attempts && attempts.length > 0) {
-      const a = attempts[0];
-      const percent = Math.round((a.score / a.total) * 100);
-      document.getElementById('lastTestCard').innerHTML = `
-        <div style="display:flex; align-items:center; gap:14px;">
-          <div class="score-circle">${percent}%</div>
-          <div class="test-info"><h4>${a.chapters?.title || 'Chapter Test'}</h4><p>${a.score}/${a.total} correct</p></div>
-        </div>
-        <a href="test-history.html" class="view-link">View →</a>`;
-      document.getElementById('lastTestSection').style.display = 'block';
-    }
-
-    // REAL XP + STREAK
-    const { data: xpRows, error: xpError } = await supabaseClient
-      .from('xp_transactions')
-      .select('amount, created_at')
-      .eq('user_id', session.user.id);
-
-    let realXp = Number(profile?.total_xp || 0);
-    if (!xpError && xpRows) {
-      realXp = xpRows.reduce((sum, row) => sum + Number(row.amount || 0), 0);
-      document.getElementById('xpAmount').textContent = realXp;
-      const heroXp = document.getElementById('heroXp'); if (heroXp) heroXp.textContent = realXp;
-      const heroFill = document.getElementById('heroXpFill'); if (heroFill) heroFill.style.width = Math.min(100, Math.max(6, (realXp % 1000) / 10)) + '%';
-      const heroText = document.getElementById('xpProgressText'); if (heroText) heroText.textContent = realXp + ' XP earned so far';
-    } else {
-      document.getElementById('xpAmount').textContent = realXp;
-      const heroXp = document.getElementById('heroXp'); if (heroXp) heroXp.textContent = realXp;
-      const heroFill = document.getElementById('heroXpFill'); if (heroFill) heroFill.style.width = Math.min(100, Math.max(6, (realXp % 1000) / 10)) + '%';
-      const heroText = document.getElementById('xpProgressText'); if (heroText) heroText.textContent = realXp + ' XP earned so far';
-    }
-
-    const dateKey = (date) => {
-      const y = date.getFullYear();
-      const m = String(date.getMonth() + 1).padStart(2, '0');
-      const d = String(date.getDate()).padStart(2, '0');
-      return `${y}-${m}-${d}`;
-    };
-
-    const xpDays = new Set((xpRows || [])
-      .filter(row => Number(row.amount || 0) > 0)
-      .map(row => dateKey(new Date(row.created_at))));
-
-    let streak = 0;
-    const cursor = new Date();
-    cursor.setHours(0, 0, 0, 0);
-
-    // If no XP was earned today, continue checking from yesterday.
-    if (!xpDays.has(dateKey(cursor))) cursor.setDate(cursor.getDate() - 1);
-
-    while (xpDays.has(dateKey(cursor))) {
-      streak++;
-      cursor.setDate(cursor.getDate() - 1);
-    }
-
-    const streakEl = document.getElementById('streakNum');
-    if (streakEl) streakEl.textContent = streak + (streak === 1 ? ' Day' : ' Days');
-  })();
-</script>
-
-<script>
-document.querySelectorAll('.bottom-nav .nav-item').forEach(item => {
-  item.addEventListener('click', e => e.stopPropagation());
-});
-</script>
-</body>
-</html>
+      <div><h4>Unlock professional notes</h4><p>Use XP fr
