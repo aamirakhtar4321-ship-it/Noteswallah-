@@ -17,6 +17,7 @@
   .phone{ width:100%; max-width:430px; min-height:100vh; background:var(--cream); position:relative; padding-bottom:84px; }
   h1,h2,h3,.display{ font-family:'Fraunces', serif; }
 
+  /* ===== SPLASH SCREEN ===== */
   #splash{
     position:fixed; inset:0; z-index:9999;
     background:linear-gradient(160deg,var(--navy),#0B1730);
@@ -55,9 +56,11 @@
   @keyframes glowPulse{ 0%,100%{transform:scale(.9); opacity:.4;} 50%{transform:scale(1.12); opacity:.8;} }
   @keyframes splashExit{ to{opacity:0; visibility:hidden; pointer-events:none;} }
 
+  /* ===== PAGE FADE-IN ===== */
   .phone{ animation:pageFadeIn .3s ease .05s both; }
   @keyframes pageFadeIn{ from{opacity:0;} to{opacity:1;} }
 
+  /* Top bar */
   .topbar{ background:var(--navy); color:white; padding:18px 20px 22px; border-radius:0 0 24px 24px; }
   .topbar-row{ display:flex; justify-content:space-between; align-items:center; gap:6px; }
   .logo-row{ display:flex; align-items:center; gap:7px; min-width:0; }
@@ -76,6 +79,7 @@
   .content{ padding:18px 18px 0; }
   .section-title{ font-size:15px; font-weight:700; color:var(--navy); margin:20px 2px 10px; display:flex; justify-content:space-between; align-items:center; }
 
+  /* Streak */
   .streak-card{ background:white; border-radius:var(--radius); box-shadow:var(--shadow); padding:14px 18px; display:flex; align-items:center; justify-content:space-between; }
   .streak-left{ display:flex; align-items:center; gap:12px; }
   .flame{ width:38px; height:38px; border-radius:50%; background:linear-gradient(160deg,#F6D9A6,#E8A33D); display:flex; align-items:center; justify-content:center; font-size:18px; }
@@ -85,12 +89,14 @@
   .streak-days .d{ width:8px; height:8px; border-radius:50%; background:#E3E1DB; }
   .streak-days .d.on{ background:var(--green); }
 
+  /* Quick grid — MOVED UP */
   .quick-grid{ display:grid; grid-template-columns:repeat(4,1fr); gap:10px; }
   .quick-item{ background:white; border-radius:16px; box-shadow:var(--shadow); padding:15px 6px; text-align:center; cursor:pointer; transition:transform .15s ease, box-shadow .15s ease; border:1px solid rgba(19,34,66,0.04); }
   .quick-item:active{ transform:scale(0.93); box-shadow:0 2px 8px rgba(19,34,66,0.1); }
   .quick-item .qi-icon{ width:40px; height:40px; border-radius:50%; background:linear-gradient(160deg,var(--cream),#EFEDE6); display:flex; align-items:center; justify-content:center; margin:0 auto 8px; font-size:17px; color:var(--navy); }
   .quick-item .qi-label{ font-size:10.5px; font-weight:600; color:var(--navy); line-height:1.2; }
 
+  /* Compact challenge cards */
   .challenge-row{ display:flex; gap:10px; }
   .challenge-card{ flex:1; border-radius:14px; padding:13px; color:white; box-shadow:var(--shadow); transition:transform .15s ease; }
   .challenge-card:active{ transform:scale(0.97); }
@@ -103,6 +109,7 @@
   .challenge-btn{ display:block; margin-top:10px; background:var(--gold); color:var(--navy); border:none; font-weight:700; font-size:11px; padding:7px 10px; border-radius:8px; cursor:pointer; width:100%; }
   .challenge-card.weekly .challenge-btn{ background:var(--navy); color:white; }
 
+  /* Continue reading */
   .continue-card{ background:white; border-radius:var(--radius); box-shadow:var(--shadow); padding:14px; display:flex; gap:14px; align-items:center; }
   .continue-thumb{ width:48px; height:48px; border-radius:12px; background:linear-gradient(160deg,var(--navy-light),var(--navy)); display:flex; align-items:center; justify-content:center; color:white; font-size:18px; flex-shrink:0; }
   .continue-info{ flex:1; }
@@ -129,7 +136,7 @@
   .teaser-card h4{ font-size:13.5px; font-weight:600; }
   .teaser-card p{ font-size:11px; opacity:0.8; margin-top:3px; }
 
-  .bottom-nav{ position:fixed; bottom:0; width:100%; max-width:430px; background:white; border-top:1px solid #EEE; display:flex; justify-content:space-around; padding:10px 0 14px; box-shadow:0 -4px 16px rgba(0,0,0,0.05); z-index:100; }
+  .bottom-nav{ position:fixed; bottom:0; width:100%; max-width:430px; background:white; border-top:1px solid #EEE; display:flex; justify-content:space-around; padding:10px 0 14px; box-shadow:0 -4px 16px rgba(0,0,0,0.05); }
   .nav-item{ display:flex; flex-direction:column; align-items:center; gap:3px; font-size:10.5px; font-weight:600; color:var(--grey); cursor:pointer; text-decoration:none; }
   .nav-item.active{ color:var(--navy); }
   .nav-item{ display:flex; flex-direction:column; align-items:center; gap:4px; }
@@ -152,6 +159,7 @@
   .nav-center{ display:flex; align-items:center; justify-content:center; width:50px; height:50px; border-radius:50%; background:var(--navy); color:white; margin-top:-26px; box-shadow:0 6px 14px rgba(19,34,66,0.35); text-decoration:none; flex-shrink:0; }
   .nav-center .nav-icon{ font-size:21px; }
 
+  /* UNIVERSAL DARK MODE FIX — overrides core color variables so ALL text using them auto-fixes */
   body.dark{ --cream:#0B1220 !important; --ink:#EDEDED !important; --grey:#9BA3B4 !important; background:#0B1220 !important; }
   body.dark .phone{ background:#0B1220 !important; }
   body.dark .streak-card, body.dark .continue-card, body.dark .test-card, body.dark .rec-card,
@@ -183,14 +191,14 @@
         <div class="logo">Notes<span>Wallah</span></div>
       </div>
       <div class="topbar-icons">
-        <div class="xp-badge">⚡ <span id="xpAmount">0</span> XP</div>
+        <div class="xp-badge">⚡ <span id="xpAmount">140</span> XP</div>
         <a href="notifications.html" class="icon-btn" style="text-decoration:none; color:white; position:relative;">🔔<div class="dot" id="notifDot" style="display:none;"></div></a>
         <a href="profile.html" class="icon-btn" style="color:white; text-decoration:none;">👤</a>
       </div>
     </div>
     <div class="greeting">
-      <h1 id="greetText">Good morning, Student</h1>
-      <p id="classLine">Loading...</p>
+      <h1 id="greetText">Good morning, Aman</h1>
+      <p id="classLine">Class 10 · CBSE · English Medium</p>
     </div>
   </div>
 
@@ -205,12 +213,13 @@
           <div class="streak-label">Current streak</div>
         </div>
       </div>
-      <div class="streak-days" id="streakDots">
-        <div class="d"></div><div class="d"></div><div class="d"></div>
-        <div class="d"></div><div class="d"></div><div class="d"></div><div class="d"></div>
+      <div class="streak-days">
+        <div class="d on"></div><div class="d on"></div><div class="d on"></div>
+        <div class="d on"></div><div class="d on"></div><div class="d on"></div><div class="d"></div>
       </div>
     </div>
 
+    <!-- QUICK ACCESS — moved up -->
     <div class="section-title">Quick Access</div>
     <div class="quick-grid">
       <a href="test-setup.html" class="quick-item" style="text-decoration:none; color:inherit; display:block;">
@@ -239,6 +248,7 @@
       </a>
     </div>
 
+    <!-- CHALLENGES — smaller, side by side -->
     <div class="section-title">Today & This Week</div>
     <div class="challenge-row">
       <div class="challenge-card daily">
@@ -276,6 +286,4 @@
 
 <div class="bottom-nav">
   <a href="index.html" class="nav-item active">
-    <svg class="nav-icon" width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><path d="M9 22V12h6v10"/></svg>Home</a>
-  <a href="subjects.html" class="nav-item">
-    <svg class="nav-icon" width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="r
+    <svg class="nav-icon" width="21" height="21" viewBox="0 0 24 24
