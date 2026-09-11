@@ -71,7 +71,6 @@
   .bottom-nav{ justify-content:space-between; padding:10px 18px 14px; align-items:center; }
   .nav-center{ display:flex; align-items:center; justify-content:center; width:50px; height:50px; border-radius:50%; background:var(--navy); color:white; margin-top:-26px; box-shadow:0 6px 14px rgba(19,34,66,0.35); text-decoration:none; flex-shrink:0; }
 
-  /* UNIVERSAL DARK MODE FIX — overrides core color variables so ALL text using them auto-fixes */
   body.dark{ --cream:#0B1220 !important; --ink:#EDEDED !important; --grey:#9BA3B4 !important; background:#0B1220 !important; }
   body.dark .phone{ background:#0B1220 !important; }
   body.dark .streak-card, body.dark .continue-card, body.dark .test-card, body.dark .rec-card,
@@ -82,6 +81,53 @@
   body.dark .card, body.dark .info-card{ background:#16213E !important; box-shadow:none !important; border-color:#243256 !important; }
   body.dark .nav-item{ color:#9BA3B4 !important; }
   body.dark .nav-item.active{ color:#EDEDED !important; }
+
+  /* Class Switcher */
+  .class-switch-btn{
+    display:flex; align-items:center; justify-content:center; gap:8px;
+    width:100%; padding:14px; background:linear-gradient(135deg,var(--navy),var(--navy-light));
+    color:white; border:none; border-radius:14px; font-weight:700; font-size:13.5px;
+    box-shadow:var(--shadow); cursor:pointer; margin-bottom:14px;
+  }
+  .class-switch-btn:active{ transform:scale(0.98); }
+
+  /* Modal */
+  .modal-overlay{
+    position:fixed; inset:0; background:rgba(0,0,0,0.6); z-index:9999;
+    display:none; align-items:center; justify-content:center; padding:20px;
+  }
+  .modal-overlay.show{ display:flex; }
+  .modal-box{
+    background:white; border-radius:20px; padding:24px 20px; width:100%; max-width:360px;
+    box-shadow:0 20px 60px rgba(0,0,0,0.3); animation:modalIn .25s ease;
+  }
+  @keyframes modalIn{ from{opacity:0; transform:scale(0.9);} to{opacity:1; transform:scale(1);} }
+  .modal-box h3{ font-size:18px; color:var(--navy); margin-bottom:6px; }
+  .modal-box p{ font-size:12.5px; color:var(--grey); margin-bottom:18px; }
+  .class-option{
+    display:flex; align-items:center; gap:12px; padding:14px 16px; border-radius:12px;
+    border:2px solid #EEE; margin-bottom:10px; cursor:pointer; transition:all .15s;
+    background:white;
+  }
+  .class-option:active{ transform:scale(0.98); }
+  .class-option.selected{ border-color:var(--gold); background:#FFF9EE; }
+  .class-option .co-icon{ width:38px; height:38px; border-radius:10px; background:var(--cream); display:flex; align-items:center; justify-content:center; font-weight:700; font-family:'Fraunces'; color:var(--navy); font-size:15px; }
+  .class-option .co-label{ flex:1; font-weight:600; font-size:14px; color:var(--navy); }
+  .class-option .co-check{ color:var(--gold); font-size:18px; display:none; }
+  .class-option.selected .co-check{ display:block; }
+  .modal-actions{ display:flex; gap:10px; margin-top:16px; }
+  .modal-actions button{ flex:1; padding:12px; border-radius:12px; font-weight:700; font-size:13.5px; border:none; cursor:pointer; }
+  .btn-cancel{ background:#F0EEE8; color:var(--ink); }
+  .btn-save{ background:var(--navy); color:white; }
+  .btn-save:disabled{ opacity:0.5; }
+
+  body.dark .modal-box{ background:#16213E; }
+  body.dark .modal-box h3{ color:#EDEDED; }
+  body.dark .class-option{ background:#0B1220; border-color:#243256; }
+  body.dark .class-option.selected{ background:#1E2A4A; border-color:var(--gold); }
+  body.dark .class-option .co-label{ color:#EDEDED; }
+  body.dark .class-option .co-icon{ background:#1E2A4A; color:#EDEDED; }
+  body.dark .btn-cancel{ background:#243256; color:#EDEDED; }
 </style>
 </head>
 <body>
@@ -104,6 +150,12 @@
       <div class="stat-box"><div class="num" id="certNum">0</div><div class="lbl">Certificates</div></div>
     </div>
 
+    <!-- CLASS SWITCH BUTTON -->
+    <button class="class-switch-btn" onclick="openClassModal()">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>
+      <span id="classSwitchLabel">Change Class</span>
+    </button>
+
     <div class="menu-card">
       <a href="certificates-list.html" class="menu-item"><div class="menu-icon"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 21h8M12 17v4M7 4h10v5a5 5 0 0 1-10 0z"/><path d="M17 5h3a2 2 0 0 1-2 4M7 5H4a2 2 0 0 0 2 4"/></svg></div><div class="menu-label">My Certificates</div><div class="menu-chevron">›</div></a>
       <a href="my-unlocked.html" class="menu-item"><div class="menu-icon"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6M9 13h6M9 17h6"/></svg></div><div class="menu-label">My Unlocked Notes</div><div class="menu-chevron">›</div></a>
@@ -122,7 +174,7 @@
       <div class="menu-item" style="cursor:default;"><div class="menu-icon"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 10h-1.26A8 8 0 1 0 9 20h9a5 5 0 0 0 0-10z"/></svg></div><div class="menu-label" id="backupLabel">Backup — cloud synced</div></div>
     </div>
 
-        <div class="menu-card">
+    <div class="menu-card">
       <div style="padding:14px 16px 4px; font-size:11px; font-weight:700; color:var(--grey); text-transform:uppercase; letter-spacing:0.5px;">Badges</div>
       <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:10px; padding:8px 16px 16px;">
         <div style="text-align:center;"><div style="font-size:26px; opacity:0.25;" id="badge1">🎯</div><div style="font-size:10.5px; font-weight:600; margin-top:4px;">First Steps</div></div>
@@ -134,9 +186,26 @@
     <button class="logout-btn" onclick="doLogout()">Log Out</button>
   </div>
 </div>
+
+<!-- CLASS SWITCH MODAL -->
+<div class="modal-overlay" id="classModal">
+  <div class="modal-box">
+    <h3>Change Class</h3>
+    <p>Apni class select karo. Saare subjects, chapters aur tests usi class ke hisaab se dikhenge.</p>
+    <div id="classOptions"></div>
+    <div class="modal-actions">
+      <button class="btn-cancel" onclick="closeClassModal()">Cancel</button>
+      <button class="btn-save" id="classSaveBtn" onclick="saveClass()" disabled>Save</button>
+    </div>
+  </div>
+</div>
+
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="supabase-config.js"></script>
 <script>
+  let currentUser = null;
+  let selectedClass = null;
+
   async function doLogout(){
     await supabaseClient.auth.signOut();
     window.location.href = "login.html";
@@ -155,64 +224,124 @@
     if (!('Notification' in window)) { alert('Notifications are not supported on this browser.'); return; }
     const perm = await Notification.requestPermission();
     document.getElementById('notifToggle').classList.toggle('on', perm === 'granted');
-    if (perm === 'granted') new Notification('Notes Wallah', { body: 'Notifications are now on! Full daily reminders coming in a future update.' });
+    if (perm === 'granted') new Notification('Notes Wallah', { body: 'Notifications are now on!' });
   }
-  if (Notification && Notification.permission === 'granted') document.getElementById('notifToggle').classList.add('on');
+  if (typeof Notification !== 'undefined' && Notification.permission === 'granted') document.getElementById('notifToggle').classList.add('on');
 
+  // ===== CLASS SWITCH MODAL =====
+  const CLASS_OPTIONS = [
+    { value: '9',  label: 'Class 9',  icon: '9'  },
+    { value: '10', label: 'Class 10', icon: '10' },
+    { value: '11', label: 'Class 11', icon: '11' },
+    { value: '12', label: 'Class 12', icon: '12' }
+  ];
+
+  function openClassModal(){
+    const container = document.getElementById('classOptions');
+    container.innerHTML = CLASS_OPTIONS.map(c => `
+      <div class="class-option ${selectedClass === c.value ? 'selected' : ''}" onclick="pickClass('${c.value}')">
+        <div class="co-icon">${c.icon}</div>
+        <div class="co-label">${c.label}</div>
+        <div class="co-check">✓</div>
+      </div>
+    `).join('');
+    document.getElementById('classSaveBtn').disabled = true;
+    document.getElementById('classModal').classList.add('show');
+  }
+
+  function closeClassModal(){
+    document.getElementById('classModal').classList.remove('show');
+  }
+
+  function pickClass(val){
+    selectedClass = val;
+    document.querySelectorAll('.class-option').forEach(el => el.classList.remove('selected'));
+    event.currentTarget.classList.add('selected');
+    document.getElementById('classSaveBtn').disabled = false;
+  }
+
+  async function saveClass(){
+    if (!currentUser || !selectedClass) return;
+    const btn = document.getElementById('classSaveBtn');
+    btn.textContent = 'Saving...';
+    btn.disabled = true;
+
+    const { error } = await supabaseClient
+      .from('profiles')
+      .update({ class_selected: parseInt(selectedClass) })
+      .eq('id', currentUser.id);
+
+    if (error) {
+      alert('Save nahi hua: ' + error.message);
+      btn.textContent = 'Save';
+      btn.disabled = false;
+      return;
+    }
+
+    // Update UI
+    document.getElementById('classSwitchLabel').textContent = 'Class ' + selectedClass + ' — Change';
+    document.getElementById('profileMeta').textContent =
+      'Class ' + selectedClass + ' · ' + (document.getElementById('profileMeta').dataset.board || 'CBSE');
+    localStorage.setItem('nw_class', selectedClass);
+
+    btn.textContent = 'Saved ✓';
+    setTimeout(() => {
+      closeClassModal();
+      btn.textContent = 'Save';
+      // refresh page taaki sab kuch update ho jaye
+      setTimeout(() => location.reload(), 400);
+    }, 500);
+  }
+
+  // ===== IST timezone-safe date =====
+  function getISTDateStr(date){
+    const istOffset = 5.5 * 60 * 60 * 1000;
+    const utc = date.getTime() + (date.getTimezoneOffset() * 60000);
+    const ist = new Date(utc + istOffset);
+    return ist.toISOString().slice(0,10);
+  }
+
+  // ===== LOAD PROFILE =====
   (async () => {
     const { data: { session } } = await supabaseClient.auth.getSession();
     if (!session) { window.location.href = "login.html"; return; }
+    currentUser = session.user;
+
     const { data: profile } = await supabaseClient.from('profiles').select('*').eq('id', session.user.id).single();
+
     if (profile) {
       document.getElementById('profileName').textContent = profile.name || "Student";
       document.getElementById('avatarLetter').textContent = (profile.name || "S")[0].toUpperCase();
-      document.getElementById('profileMeta').textContent =
+
+      const metaEl = document.getElementById('profileMeta');
+      metaEl.dataset.board = profile.board || 'CBSE';
+      metaEl.textContent =
         (profile.class_selected ? "Class " + profile.class_selected + " · " : "") +
         (profile.board || "") + (profile.medium ? " · " + profile.medium + " Medium" : "");
+
       document.getElementById('xpNum').textContent = profile.total_xp || 0;
+
+      if (profile.class_selected) {
+        selectedClass = String(profile.class_selected);
+        document.getElementById('classSwitchLabel').textContent = 'Class ' + profile.class_selected + ' — Change';
+      } else {
+        document.getElementById('classSwitchLabel').textContent = 'Select Your Class';
+      }
     }
 
-    const { data: allXp } = await supabaseClient.from('xp_transactions').select('created_at').eq('user_id', session.user.id).gt('amount', 0);
+    // ===== STREAK (IST timezone-safe + profile fallback) =====
+    let streak = 0;
+
+    const { data: allXp } = await supabaseClient
+      .from('xp_transactions')
+      .select('created_at')
+      .eq('user_id', session.user.id)
+      .gt('amount', 0);
+
     if (allXp && allXp.length > 0) {
-      const uniqueDays = new Set(allXp.map(x => x.created_at.slice(0,10)));
-      let streak = 0;
+      const uniqueDays = new Set(allXp.map(x => getISTDateStr(new Date(x.created_at))));
       let d = new Date();
-      while (uniqueDays.has(d.toISOString().slice(0,10))) { streak++; d.setDate(d.getDate() - 1); }
-      document.getElementById('streakNum2').textContent = streak;
-    }
-
-    const { data: attempts } = await supabaseClient.from('test_attempts').select('score, total').eq('user_id', session.user.id);
-    const passedCount = (attempts || []).filter(a => (a.score/a.total) >= 0.6).length;
-    document.getElementById('certNum').textContent = passedCount;
-
-    if (attempts && attempts.length > 0) document.getElementById('badge1').style.opacity = '1';
-    else document.getElementById('badge1').style.opacity = '0.25';
-    const streakVal = parseInt(document.getElementById('streakNum2').textContent || 0);
-    document.getElementById('badge2').style.opacity = streakVal >= 7 ? '1' : '0.25';
-    const hasSharp = (attempts || []).some(a => (a.score/a.total) >= 0.9);
-    document.getElementById('badge3').style.opacity = hasSharp ? '1' : '0.25';
-
-    document.getElementById('backupLabel').textContent = 'Backup — synced ' + new Date().toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'});
-  })();
-
-  function showLangInfo(e){
-    e.preventDefault();
-    alert('More languages (Hindi, Urdu, and others) for the app interface and notes content are planned for a future update. Currently the app runs in English.');
-  }
-</script>
-
-<div class="bottom-nav">
-  <a href="index.html" class="nav-item">
-    <svg class="nav-icon" width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><path d="M9 22V12h6v10"/></svg>Home</a>
-  <a href="subjects.html" class="nav-item">
-    <svg class="nav-icon" width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>Subject</a>
-  <a href="test-setup.html" class="nav-item">
-    <svg class="nav-icon" width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>Tests</a>
-  <a href="doubts.html" class="nav-item">
-    <svg class="nav-icon" width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="8" width="18" height="12" rx="2"/><circle cx="8.5" cy="14" r="1.2" fill="currentColor" stroke="none"/><circle cx="15.5" cy="14" r="1.2" fill="currentColor" stroke="none"/><path d="M12 8V4M8 4h8"/></svg>AI</a>
-  <a href="profile.html" class="nav-item">
-    <svg class="nav-icon" width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>Profile</a>
-</div>
-
-</body>
-</html>
+      if (!uniqueDays.has(getISTDateStr(d))) {
+        d.setDate(d.getDate() - 1);
+      }
+      while (uniqueDays.has(getISTDateStr(d
