@@ -1,0 +1,347 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Notes Wallah — Profile</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --navy:#132242; --navy-light:#1D3560; --gold:#E8A33D; --gold-light:#F6D9A6;
+    --cream:#F7F5F0; --ink:#1B1B1B; --grey:#6B7280; --green:#2E8B57; --red:#C0392B;
+    --radius:16px; --shadow: 0 4px 16px rgba(19,34,66,0.08);
+  }
+  *{box-sizing:border-box; margin:0; padding:0;}
+  body{ font-family:'Inter', sans-serif; background:var(--cream); color:var(--ink); display:flex; justify-content:center; }
+  .phone{ width:100%; max-width:430px; min-height:100vh; background:var(--cream); padding-bottom:90px; }
+  h1,h2,h3{ font-family:'Fraunces', serif; }
+
+  .topbar{
+    background:var(--navy); color:white; padding:26px 20px 34px; text-align:center;
+    border-radius:0 0 28px 28px; position:relative;
+  }
+  .avatar-big{
+    width:76px; height:76px; border-radius:50%; background:var(--gold);
+    display:flex; align-items:center; justify-content:center; font-size:32px; color:var(--navy);
+    margin:0 auto 12px; font-weight:700; font-family:'Fraunces';
+  }
+  .topbar h1{ font-size:19px; }
+  .topbar p{ font-size:12.5px; color:var(--gold-light); margin-top:4px; }
+
+  .content{ padding:18px; margin-top:-18px; }
+  .stat-grid{ display:grid; grid-template-columns:1fr 1fr 1fr; gap:10px; margin-bottom:16px; }
+  .stat-box{ background:white; border-radius:14px; box-shadow:var(--shadow); padding:14px 8px; text-align:center; }
+  .stat-box .num{ font-size:17px; font-weight:700; color:var(--navy); font-family:'Fraunces'; }
+  .stat-box .lbl{ font-size:10px; color:var(--grey); margin-top:3px; }
+
+  .menu-card{ background:white; border-radius:var(--radius); box-shadow:var(--shadow); overflow:hidden; margin-bottom:14px; }
+  .menu-item{
+    display:flex; align-items:center; gap:12px; padding:14px 16px;
+    border-bottom:1px solid #F0EEE8; text-decoration:none; color:var(--ink); cursor:pointer;
+  }
+  .menu-item:last-child{ border-bottom:none; }
+  .menu-icon{ width:34px; height:34px; border-radius:10px; background:var(--cream); display:flex; align-items:center; justify-content:center; font-size:15px; }
+  .menu-label{ flex:1; font-size:13.5px; font-weight:600; }
+  .menu-chevron{ color:var(--grey); font-size:16px; }
+
+  .logout-btn{
+    width:100%; padding:13px; background:white; color:var(--red); border:none;
+    border-radius:14px; font-weight:700; font-size:13.5px; box-shadow:var(--shadow); cursor:pointer;
+  }
+  .toggle-switch{ width:44px; height:24px; border-radius:14px; background:#DDD; position:relative; transition:background .2s; flex-shrink:0; }
+  .toggle-switch.on{ background:var(--navy); }
+  .toggle-knob{ width:18px; height:18px; border-radius:50%; background:white; position:absolute; top:3px; left:3px; transition:left .2s; box-shadow:0 1px 3px rgba(0,0,0,0.3); }
+  .toggle-switch.on .toggle-knob{ left:23px; }
+
+  .bottom-nav{
+    position:fixed; bottom:0; width:100%; max-width:430px; background:white;
+    border-top:1px solid #EEE; display:flex; justify-content:space-around;
+    padding:10px 0 14px; box-shadow:0 -4px 16px rgba(0,0,0,0.05);
+  }
+  .nav-item{ display:flex; flex-direction:column; align-items:center; gap:4px; font-size:10.5px; font-weight:600; color:var(--grey); text-decoration:none; cursor:pointer; }
+  .nav-item.active{ color:var(--navy); }
+
+  body.dark{ background:#0B1220; }
+  body.dark .phone{ background:#0B1220; }
+  body.dark .stat-box, body.dark .menu-card, body.dark .bottom-nav, body.dark .logout-btn{ background:#16213E !important; box-shadow:none; }
+  body.dark .stat-box *, body.dark .menu-item, body.dark .menu-label{ color:#EDEDED !important; }
+  body.dark .menu-item{ border-bottom-color:#243256 !important; }
+  body.dark .nav-item{ color:#9BA3B4 !important; }
+  .bottom-nav{ justify-content:space-between; padding:10px 18px 14px; align-items:center; }
+  .nav-center{ display:flex; align-items:center; justify-content:center; width:50px; height:50px; border-radius:50%; background:var(--navy); color:white; margin-top:-26px; box-shadow:0 6px 14px rgba(19,34,66,0.35); text-decoration:none; flex-shrink:0; }
+
+  body.dark{ --cream:#0B1220 !important; --ink:#EDEDED !important; --grey:#9BA3B4 !important; background:#0B1220 !important; }
+  body.dark .phone{ background:#0B1220 !important; }
+  body.dark .streak-card, body.dark .continue-card, body.dark .test-card, body.dark .rec-card,
+  body.dark .challenge-card.weekly, body.dark .quick-item, body.dark .bottom-nav, body.dark .subject-card,
+  body.dark .chapter-card, body.dark .note-body, body.dark .stat-box, body.dark .menu-card,
+  body.dark .cert-card, body.dark .note-card, body.dark .attempt-card, body.dark .intro-card,
+  body.dark .bubble.sara, body.dark .q-card, body.dark .q-block, body.dark .cert-frame,
+  body.dark .card, body.dark .info-card{ background:#16213E !important; box-shadow:none !important; border-color:#243256 !important; }
+  body.dark .nav-item{ color:#9BA3B4 !important; }
+  body.dark .nav-item.active{ color:#EDEDED !important; }
+
+  /* Class Switcher */
+  .class-switch-btn{
+    display:flex; align-items:center; justify-content:center; gap:8px;
+    width:100%; padding:14px; background:linear-gradient(135deg,var(--navy),var(--navy-light));
+    color:white; border:none; border-radius:14px; font-weight:700; font-size:13.5px;
+    box-shadow:var(--shadow); cursor:pointer; margin-bottom:14px;
+  }
+  .class-switch-btn:active{ transform:scale(0.98); }
+
+  /* Modal */
+  .modal-overlay{
+    position:fixed; inset:0; background:rgba(0,0,0,0.6); z-index:9999;
+    display:none; align-items:center; justify-content:center; padding:20px;
+  }
+  .modal-overlay.show{ display:flex; }
+  .modal-box{
+    background:white; border-radius:20px; padding:24px 20px; width:100%; max-width:360px;
+    box-shadow:0 20px 60px rgba(0,0,0,0.3); animation:modalIn .25s ease;
+  }
+  @keyframes modalIn{ from{opacity:0; transform:scale(0.9);} to{opacity:1; transform:scale(1);} }
+  .modal-box h3{ font-size:18px; color:var(--navy); margin-bottom:6px; }
+  .modal-box p{ font-size:12.5px; color:var(--grey); margin-bottom:18px; }
+  .class-option{
+    display:flex; align-items:center; gap:12px; padding:14px 16px; border-radius:12px;
+    border:2px solid #EEE; margin-bottom:10px; cursor:pointer; transition:all .15s;
+    background:white;
+  }
+  .class-option:active{ transform:scale(0.98); }
+  .class-option.selected{ border-color:var(--gold); background:#FFF9EE; }
+  .class-option .co-icon{ width:38px; height:38px; border-radius:10px; background:var(--cream); display:flex; align-items:center; justify-content:center; font-weight:700; font-family:'Fraunces'; color:var(--navy); font-size:15px; }
+  .class-option .co-label{ flex:1; font-weight:600; font-size:14px; color:var(--navy); }
+  .class-option .co-check{ color:var(--gold); font-size:18px; display:none; }
+  .class-option.selected .co-check{ display:block; }
+  .modal-actions{ display:flex; gap:10px; margin-top:16px; }
+  .modal-actions button{ flex:1; padding:12px; border-radius:12px; font-weight:700; font-size:13.5px; border:none; cursor:pointer; }
+  .btn-cancel{ background:#F0EEE8; color:var(--ink); }
+  .btn-save{ background:var(--navy); color:white; }
+  .btn-save:disabled{ opacity:0.5; }
+
+  body.dark .modal-box{ background:#16213E; }
+  body.dark .modal-box h3{ color:#EDEDED; }
+  body.dark .class-option{ background:#0B1220; border-color:#243256; }
+  body.dark .class-option.selected{ background:#1E2A4A; border-color:var(--gold); }
+  body.dark .class-option .co-label{ color:#EDEDED; }
+  body.dark .class-option .co-icon{ background:#1E2A4A; color:#EDEDED; }
+  body.dark .btn-cancel{ background:#243256; color:#EDEDED; }
+</style>
+</head>
+<body>
+<script>if(localStorage.getItem('nw_dark_mode')==='1')document.body.classList.add('dark');</script>
+
+<div class="phone">
+  <div class="topbar">
+    <div style="position:absolute; top:16px; right:16px; width:34px; height:34px; border-radius:50%; background:rgba(255,255,255,0.15); display:flex; align-items:center; justify-content:center; cursor:pointer;" onclick="enableNotifs(event)">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+    </div>
+    <div class="avatar-big" id="avatarLetter">A</div>
+    <h1 id="profileName">Loading...</h1>
+    <p id="profileMeta">—</p>
+  </div>
+
+  <div class="content">
+    <div class="stat-grid">
+      <div class="stat-box"><div class="num" id="xpNum">0</div><div class="lbl">XP Coins</div></div>
+      <div class="stat-box"><div class="num" id="streakNum2">0</div><div class="lbl">Day Streak</div></div>
+      <div class="stat-box"><div class="num" id="certNum">0</div><div class="lbl">Certificates</div></div>
+    </div>
+
+    <!-- CLASS SWITCH BUTTON -->
+    <button class="class-switch-btn" onclick="openClassModal()">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>
+      <span id="classSwitchLabel">Change Class</span>
+    </button>
+
+    <div class="menu-card">
+      <a href="certificates-list.html" class="menu-item"><div class="menu-icon"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 21h8M12 17v4M7 4h10v5a5 5 0 0 1-10 0z"/><path d="M17 5h3a2 2 0 0 1-2 4M7 5H4a2 2 0 0 0 2 4"/></svg></div><div class="menu-label">My Certificates</div><div class="menu-chevron">›</div></a>
+      <a href="my-unlocked.html" class="menu-item"><div class="menu-icon"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6M9 13h6M9 17h6"/></svg></div><div class="menu-label">My Unlocked Notes</div><div class="menu-chevron">›</div></a>
+      <a href="test-history.html" class="menu-item"><div class="menu-icon"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v18h18"/><path d="M18 17V9M13 17V5M8 17v-4"/></svg></div><div class="menu-label">Test History</div><div class="menu-chevron">›</div></a>
+      <a href="bookmarks.html" class="menu-item"><div class="menu-icon"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/></svg></div><div class="menu-label">Bookmarked Chapters</div><div class="menu-chevron">›</div></a>
+    </div>
+
+    <div class="menu-card">
+      <a href="#" class="menu-item" onclick="showLangInfo(event)"><div class="menu-icon"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M2 12h20M12 2a15 15 0 0 1 0 20 15 15 0 0 1 0-20z"/></svg></div><div class="menu-label">Language — English</div><div class="menu-chevron">›</div></a>
+      <a href="#" class="menu-item" onclick="toggleDark(event)"><div class="menu-icon"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg></div><div class="menu-label">Dark Mode</div>
+        <div class="toggle-switch" id="darkToggle"><div class="toggle-knob"></div></div>
+      </a>
+      <a href="#" class="menu-item" onclick="enableNotifs(event)"><div class="menu-icon"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg></div><div class="menu-label">Notifications</div>
+        <div class="toggle-switch" id="notifToggle"><div class="toggle-knob"></div></div>
+      </a>
+      <div class="menu-item" style="cursor:default;"><div class="menu-icon"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 10h-1.26A8 8 0 1 0 9 20h9a5 5 0 0 0 0-10z"/></svg></div><div class="menu-label" id="backupLabel">Backup — cloud synced</div></div>
+    </div>
+
+    <div class="menu-card">
+      <div style="padding:14px 16px 4px; font-size:11px; font-weight:700; color:var(--grey); text-transform:uppercase; letter-spacing:0.5px;">Badges</div>
+      <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:10px; padding:8px 16px 16px;">
+        <div style="text-align:center;"><div style="font-size:26px; opacity:0.25;" id="badge1">🎯</div><div style="font-size:10.5px; font-weight:600; margin-top:4px;">First Steps</div></div>
+        <div style="text-align:center;"><div style="font-size:26px; opacity:0.25;" id="badge2">🔥</div><div style="font-size:10.5px; font-weight:600; margin-top:4px;">Week Warrior</div></div>
+        <div style="text-align:center;"><div style="font-size:26px; opacity:0.25;" id="badge3">🏹</div><div style="font-size:10.5px; font-weight:600; margin-top:4px;">Sharpshooter</div></div>
+      </div>
+    </div>
+
+    <button class="logout-btn" onclick="doLogout()">Log Out</button>
+  </div>
+</div>
+
+<!-- CLASS SWITCH MODAL -->
+<div class="modal-overlay" id="classModal">
+  <div class="modal-box">
+    <h3>Change Class</h3>
+    <p>Apni class select karo. Saare subjects, chapters aur tests usi class ke hisaab se dikhenge.</p>
+    <div id="classOptions"></div>
+    <div class="modal-actions">
+      <button class="btn-cancel" onclick="closeClassModal()">Cancel</button>
+      <button class="btn-save" id="classSaveBtn" onclick="saveClass()" disabled>Save</button>
+    </div>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="supabase-config.js"></script>
+<script>
+  let currentUser = null;
+  let selectedClass = null;
+
+  async function doLogout(){
+    await supabaseClient.auth.signOut();
+    window.location.href = "login.html";
+  }
+  function toggleDark(e){
+    e.preventDefault();
+    const isDark = localStorage.getItem('nw_dark_mode') === '1';
+    localStorage.setItem('nw_dark_mode', isDark ? '0' : '1');
+    document.getElementById('darkToggle').classList.toggle('on', !isDark);
+    document.body.classList.toggle('dark', !isDark);
+  }
+  if (localStorage.getItem('nw_dark_mode') === '1') document.getElementById('darkToggle').classList.add('on');
+
+  async function enableNotifs(e){
+    e.preventDefault();
+    if (!('Notification' in window)) { alert('Notifications are not supported on this browser.'); return; }
+    const perm = await Notification.requestPermission();
+    document.getElementById('notifToggle').classList.toggle('on', perm === 'granted');
+    if (perm === 'granted') new Notification('Notes Wallah', { body: 'Notifications are now on!' });
+  }
+  if (typeof Notification !== 'undefined' && Notification.permission === 'granted') document.getElementById('notifToggle').classList.add('on');
+
+  // ===== CLASS SWITCH MODAL =====
+  const CLASS_OPTIONS = [
+    { value: '9',  label: 'Class 9',  icon: '9'  },
+    { value: '10', label: 'Class 10', icon: '10' },
+    { value: '11', label: 'Class 11', icon: '11' },
+    { value: '12', label: 'Class 12', icon: '12' }
+  ];
+
+  function openClassModal(){
+    const container = document.getElementById('classOptions');
+    container.innerHTML = CLASS_OPTIONS.map(c => `
+      <div class="class-option ${selectedClass === c.value ? 'selected' : ''}" onclick="pickClass('${c.value}')">
+        <div class="co-icon">${c.icon}</div>
+        <div class="co-label">${c.label}</div>
+        <div class="co-check">✓</div>
+      </div>
+    `).join('');
+    document.getElementById('classSaveBtn').disabled = true;
+    document.getElementById('classModal').classList.add('show');
+  }
+
+  function closeClassModal(){
+    document.getElementById('classModal').classList.remove('show');
+  }
+
+  function pickClass(val){
+    selectedClass = val;
+    document.querySelectorAll('.class-option').forEach(el => el.classList.remove('selected'));
+    event.currentTarget.classList.add('selected');
+    document.getElementById('classSaveBtn').disabled = false;
+  }
+
+  async function saveClass(){
+    if (!currentUser || !selectedClass) return;
+    const btn = document.getElementById('classSaveBtn');
+    btn.textContent = 'Saving...';
+    btn.disabled = true;
+
+    const { error } = await supabaseClient
+      .from('profiles')
+      .update({ class_selected: parseInt(selectedClass) })
+      .eq('id', currentUser.id);
+
+    if (error) {
+      alert('Save nahi hua: ' + error.message);
+      btn.textContent = 'Save';
+      btn.disabled = false;
+      return;
+    }
+
+    // Update UI
+    document.getElementById('classSwitchLabel').textContent = 'Class ' + selectedClass + ' — Change';
+    document.getElementById('profileMeta').textContent =
+      'Class ' + selectedClass + ' · ' + (document.getElementById('profileMeta').dataset.board || 'CBSE');
+    localStorage.setItem('nw_class', selectedClass);
+
+    btn.textContent = 'Saved ✓';
+    setTimeout(() => {
+      closeClassModal();
+      btn.textContent = 'Save';
+      // refresh page taaki sab kuch update ho jaye
+      setTimeout(() => location.reload(), 400);
+    }, 500);
+  }
+
+  // ===== IST timezone-safe date =====
+  function getISTDateStr(date){
+    const istOffset = 5.5 * 60 * 60 * 1000;
+    const utc = date.getTime() + (date.getTimezoneOffset() * 60000);
+    const ist = new Date(utc + istOffset);
+    return ist.toISOString().slice(0,10);
+  }
+
+  // ===== LOAD PROFILE =====
+  (async () => {
+    const { data: { session } } = await supabaseClient.auth.getSession();
+    if (!session) { window.location.href = "login.html"; return; }
+    currentUser = session.user;
+
+    const { data: profile } = await supabaseClient.from('profiles').select('*').eq('id', session.user.id).single();
+
+    if (profile) {
+      document.getElementById('profileName').textContent = profile.name || "Student";
+      document.getElementById('avatarLetter').textContent = (profile.name || "S")[0].toUpperCase();
+
+      const metaEl = document.getElementById('profileMeta');
+      metaEl.dataset.board = profile.board || 'CBSE';
+      metaEl.textContent =
+        (profile.class_selected ? "Class " + profile.class_selected + " · " : "") +
+        (profile.board || "") + (profile.medium ? " · " + profile.medium + " Medium" : "");
+
+      document.getElementById('xpNum').textContent = profile.total_xp || 0;
+
+      if (profile.class_selected) {
+        selectedClass = String(profile.class_selected);
+        document.getElementById('classSwitchLabel').textContent = 'Class ' + profile.class_selected + ' — Change';
+      } else {
+        document.getElementById('classSwitchLabel').textContent = 'Select Your Class';
+      }
+    }
+
+    // ===== STREAK (IST timezone-safe + profile fallback) =====
+    let streak = 0;
+
+    const { data: allXp } = await supabaseClient
+      .from('xp_transactions')
+      .select('created_at')
+      .eq('user_id', session.user.id)
+      .gt('amount', 0);
+
+    if (allXp && allXp.length > 0) {
+      const uniqueDays = new Set(allXp.map(x => getISTDateStr(new Date(x.created_at))));
+      let d = new Date();
+      if (!uniqueDays.has(getISTDateStr(d))) {
+        d.setDate(d.getDate() - 1);
+      }
+      while (uniqueDays.has(getISTDateStr(d
