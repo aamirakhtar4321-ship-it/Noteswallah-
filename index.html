@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Notes Wallah</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{ --navy:#132242; --navy-light:#1D3560; --gold:#E8A33D; --gold-light:#F6D9A6; --cream:#F7F5F0; --ink:#1B1B1B; --grey:#6B7280; --green:#2E8B57; --red:#C0392B; --radius:16px; --shadow:0 4px 16px rgba(19,34,66,0.08); }
+  *{box-sizing:border-box; margin:0; padding:0;}
+  body{ font-family:'Inter', sans-serif; background:var(--cream); color:var(--ink); display:flex; justify-content:center; }
+  .phone{ width:100%; max-width:430px; min-height:100vh; background:var(--cream); position:relative; padding-bottom:84px; }
+  h1,h2,h3{ font-family:'Fraunces', serif; }
+  #splash{ position:fixed; inset:0; z-index:9999; background:linear-gradient(160deg,var(--navy),#0B1730); display:flex; flex-direction:column; align-items:center; justify-content:center; animation:splashExit .5s ease forwards; animation-delay:1.3s; }
+  .splash-glow{ position:absolute; width:260px; height:260px; border-radius:50%; background:rgba(232,163,61,0.18); filter:blur(70px); animation:glowPulse 2.2s ease-in-out infinite; }
+  .splash-logo{ position:relative; width:88px; height:88px; border-radius:24px; overflow:hidden; opacity:0; animation:logoIn .8s cubic-bezier(.2,.8,.2,1) forwards; box-shadow:0 10px 30px rgba(0,0,0,0.4); }
+  .splash-logo img{ width:100%; height:100%; object-fit:cover; }
+  .splash-name{ position:relative; margin-top:20px; color:var(--gold-light); font-size:13px; font-weight:700; letter-spacing:4px; opacity:0; animation:nameIn .8s ease forwards; animation-delay:.5s; }
+  @keyframes logoIn{ 0%{opacity:0; transform:translateY(30px) scale(.7);} 100%{opacity:1; transform:translateY(0) scale(1);} }
+  @keyframes nameIn{ from{opacity:0;} to{opacity:1;} }
+  @keyframes glowPulse{ 0%,100%{transform:scale(.9); opacity:.4;} 50%{transform:scale(1.12); opacity:.8;} }
+  @keyframes splashExit{ to{opacity:0; visibility:hidden; pointer-events:none;} }
+  @keyframes pageFadeIn{ from{opacity:0;} to{opacity:1;} }
+  .phone{ animation:pageFadeIn .3s ease .05s both; }
+  .topbar{ background:var(--navy); color:white; padding:18px 20px 22px; border-radius:0 0 24px 24px; position:relative; }
+  .topbar-row{ display:flex; justify-content:space-between; align-items:center; gap:6px; }
+  .logo-row{ display:flex; align-items:center; gap:7px; min-width:0; }
+  .logo-img{ width:28px; height:28px; border-radius:8px; overflow:hidden; flex-shrink:0; }
+  .logo-img img{ width:100%; height:100%; object-fit:cover; display:block; }
+  .logo{ font-family:'Fraunces', serif; font-weight:700; font-size:17px; }
+  .logo span{color:var(--gold);}
+  .topbar-icons{display:flex; align-items:center; gap:8px; flex-shrink:0;}
+  .icon-btn{ width:32px; height:32px; border-radius:50%; background:rgba(255,255,255,0.1); display:flex; align-items:center; justify-content:center; font-size:14px; position:relative; cursor:pointer; text-decoration:none; color:white; }
+  .xp-badge{ background:var(--gold); color:var(--navy); font-weight:700; font-size:11.5px; padding:6px 9px; border-radius:20px; display:flex; align-items:center; gap:4px; white-space:nowrap; }
+  .dot{ position:absolute; top:2px; right:2px; width:8px; height:8px; border-radius:50%; background:var(--red); border:1.5px solid var(--navy); }
+  .greeting{ margin-top:18px; }
+  .greeting h1{ font-size:22px; font-weight:600; }
+  .greeting p{ margin-top:4px; color:var(--gold-light); font-size:13.5px; }
+  .content{ padding:18px 18px 0; }
+  .section-title{ font-size:15px; font-weight:700; color:var(--navy); margin:20px 2px 10px; }
+  .streak-card{ background:white; border-radius:var(--radius); box-shadow:var(--shadow); padding:14px 18px; display:flex; align-items:center; justify-content:space-between; }
+  .streak-left{ display:flex; align-items:center; gap:12px; }
+  .flame{ width:38px; height:38px; border-radius:50%; background:linear-gradient(160deg,#F6D9A6,#E8A33D); display:flex; align-items:center; justify-content:center; font-size:18px; }
+  .streak-num{ font-size:18px; font-weight:700; font-family:'Fraunces';}
+  .streak-label{ font-size:11.5px; color:var(--grey); }
+  .quick-grid{ display:grid; grid-template-columns:repeat(4,1fr); gap:10px; }
+  .quick-item{ background:white; border-radius:16px; box-shadow:var(--shadow); padding:15px 6px; text-align:center; cursor:pointer; transition:transform .15s ease; border:1px solid rgba(19,34,66,0.04); text-decoration:none; color:inherit; display:block; }
+  .quick-item:active{ transform:scale(0.93); }
+  .quick-item .qi-icon{ width:40px; height:40px; border-radius:50%; background:linear-gradient(160deg,var(--cream),#EFEDE6); display:flex; align-items:center; justify-content:center; margin:0 auto 8px; font-size:17px; color:var(--navy); }
+  .quick-item .qi-label{ font-size:10.5px; font-weight:600; color:var(--navy); line-height:1.2; }
+  .challenge-row{ display:flex; gap:10px; }
+  .challenge-card{ flex:1; border-radius:14px; padding:13px; color:white; box-shadow:var(--shadow); }
+  .challenge-card.daily{ background:linear-gradient(135deg,var(--navy),var(--navy-light)); }
+  .challenge-card.weekly{ background:white; color:var(--navy); border:1.5px solid #E3E1DB; }
+  .challenge-tag{ font-size:9px; font-weight:700; text-transform:uppercase; opacity:0.75; }
+  .challenge-title{ font-family:'Fraunces'; font-size:14px; font-weight:600; margin-top:3px; }
+  .xp-pill{ background:var(--gold); color:var(--navy); font-size:10px; font-weight:700; padding:3px 8px; border-radius:10px; display:inline-block; margin-top:6px; }
+  .challenge-card.weekly .xp-pill{ background:var(--navy); color:white; }
+  .challenge-btn{ display:block; margin-top:10px; background:var(--gold); color:var(--navy); border:none; font-weight:700; font-size:11px; padding:7px 10px; border-radius:8px; cursor:pointer; width:100%; }
+  .challenge-card.weekly .challenge-btn{ background:var(--navy); color:white; }
+  .test-card{ background:white; border-radius:var(--radius); box-shadow:var(--shadow); padding:16px; display:flex; justify-content:space-between; align-items:center; }
+  .score-circle{ width:48px; height:48px; border-radius:50%; border:4px solid var(--green); display:flex; align-items:center; justify-content:center; font-weight:700; font-size:13px; color:var(--navy); }
+  .test-info h4{ font-size:13.5px; font-weight:600; }
+  .test-info p{ font-size:11px; color:var(--grey); margin-top:2px; }
+  .view-link{ font-size:12px; font-weight:700; color:var(--navy); }
+  .teaser-card{ background:linear-gradient(135deg,#2B1B4A,#4A2D7A); border-radius:var(--radius); padding:16px; color:white; display:flex; justify-content:space-between; align-items:center; }
+  .teaser-card h4{ font-size:13.5px; font-weight:600; }
+  .teaser-card p{ font-size:11px; opacity:0.8; margin-top:3px; }
+  .bottom-nav{ position:fixed; bottom:0; width:100%; max-width:430px; background:white; border-top:1px solid #EEE; display:flex; justify-content:space-between; padding:10px 18px 14px; align-items:center; }
+  .nav-item{ display:flex; flex-direction:column; align-items:center; gap:4px; font-size:10.5px; font-weight:600; color:var(--grey); text-decoration:none; }
+  .nav-item.active{ color:var(--navy); }
+  body.dark{ --cream:#0B1220 !important; --ink:#EDEDED !important; --grey:#9BA3B4 !important; background:#0B1220 !important; }
+  body.dark .phone{ background:#0B1220 !important; }
+  body.dark .streak-card, body.dark .quick-item, body.dark .challenge-card.weekly, body.dark .test-card, body.dark .bottom-nav{ background:#16213E !important; box-shadow:none !important; }
+  body.dark .nav-item{ color:#9BA3B4 !important; }
+  body.dark .nav-item.active{ color:#EDEDED !important; }
+</style>
+</head>
+<body>
+<script>if(localStorage.getItem('nw_dark_mode')==='1')document.body.classList.add('dark');</script>
+<div id="splash">
+  <div class="splash-glow"></div>
+  <div class="splash-logo"><img src="logo.png" alt="Notes Wallah"></div>
+  <div class="splash-name">NOTES WALLAH</div>
+</div>
+<div class="phone">
+  <div class="topbar">
+    <div class="topbar-row">
+      <div class="logo-row">
+        <div class="logo-img"><img src="logo.png" alt="logo"></div>
+        <div class="logo">Notes<span>Wallah</span></div>
+      </div>
+      <div class="topbar-icons">
+        <div class="xp-badge">⚡ <span id="xpAmount">0</span> XP</div>
+        <a href="notifications.html" class="icon-btn">🔔<div class="dot" id="notifDot" style="display:none;"></div></a>
+        <a href="profile.html" class="icon-btn">👤</a>
+      </div>
+    </div>
+    <div class="greeting">
+      <h1 id="greetText">Good morning, Student</h1>
+      <p id="classLine">Loading...</p>
+    </div>
+  </div>
+  <div class="content">
+    <div style="background:#EEE; color:#999; text-align:center; font-size:10.5px; padding:8px; border-radius:8px; margin-bottom:12px;">📢 Home Banner Ad Space</div>
+    <div class="streak-card">
+      <div class="streak-left">
+        <div class="flame">🔥</div>
+        <div><div class="streak-num" id="streakNum">0 Days</div><div class="streak-label">Current streak</div></div>
+      </div>
+    </div>
+    <div class="section-title">Quick Access</div>
+    <div class="quick-grid">
+      <a href="test-setup.html" class="quick-item"><div class="qi-icon">📝</div><div class="qi-label">Test Zone</div></a>
+      <a href="certificates-list.html" class="quick-item"><div class="qi-icon">🏆</div><div class="qi-label">Certificates</div></a>
+      <a href="doubts.html" class="quick-item"><div class="qi-icon">🤖</div><div class="qi-label">Ask Sara</div></a>
+      <a href="leaderboard.html" class="quick-item"><div class="qi-icon">🏅</div><div class="qi-label">Leaderboard</div></a>
+      <a href="subjects.html" class="quick-item"><div class="qi-icon">📄</div><div class="qi-label">Pro Notes</div></a>
+      <a href="alarm.html" class="quick-item"><div class="qi-icon">⏰</div><div class="qi-label">Study Alarm</div></a>
+      <a href="coming-soon.html?feature=Mock%20Papers" class="quick-item"><div class="qi-icon">📄</div><div class="qi-label">Mock Papers</div></a>
+      <a href="study-planner.html" class="quick-item"><div class="qi-icon">📅</div><div class="qi-label">Study Planner</div></a>
+    </div>
+    <div class="section-title">Today & This Week</div>
+    <div class="challenge-row">
+      <div class="challenge-card daily">
+        <div class="challenge-tag">Daily · 5Q</div>
+        <div class="challenge-title">Tap to see today's chapter</div>
+        <div class="xp-pill">+10 XP</div>
+        <button class="challenge-btn" onclick="window.location.href='daily-challenge.html'">Start</button>
+      </div>
+      <div class="challenge-card weekly">
+        <div class="challenge-tag" style="color:var(--grey);">Weekly · 5Q</div>
+        <div class="challenge-title">Recap Test</div>
+        <div class="xp-pill">+50 XP</div>
+        <button class="challenge-btn" onclick="window.location.href='weekly-challenge.html'">View</button>
+      </div>
+    </div>
+    <div id="lastTestSection" style="display:none;">
+      <div class="section-title">Last Test Result</div>
+      <div class="test-card" id="lastTestCard"></div>
+    </div>
+    <div class="section-title">Professional Notes</div>
+    <div class="teaser-card">
+      <div><h4>Unlock professional notes</h4><p>Use XP from challenges to unlock premium notes</p></div>
+      <div class="xp-pill" style="background:var(--gold); color:var(--navy);">50 XP</div>
+    </div>
+  </div>
+</div>
+<div class="bottom-nav">
+  <a href="index.html" class="nav-item active">
+    <svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><path d="M9 22V12h6v10"/></svg>Home</a>
+  <a href="subjects.html" class="nav-item">
+    <svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>Subject</a>
+  <a href="test-setup.html" class="nav-item">
+    <svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>Tests</a>
+  <a href="doubts.html" class="nav-item">
+    <svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="8" width="18" height="12" rx="2"/><circle cx="8.5" cy="14" r="1.2" fill="currentColor" stroke="none"/><circle cx="15.5" cy="14" r="1.2" fill="currentColor" stroke="none"/><path d="M12 8V4M8 4h8"/></svg>AI</a>
+  <a href="profile.html" class="nav-item">
+    <svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>Profile</a>
+</div>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="supabase-config.js"></script>
+<script>
+  if (localStorage.getItem('nw_splash_shown_ever')) { document.getElementById('splash').style.display = 'none'; }
+  else { localStorage.setItem('nw_splash_shown_ever', '1'); }
+  const hour = new Date().getHours();
+  let greet = "Good morning";
+  if (hour >= 12 && hour < 17) greet = "Good afternoon";
+  else if (hour >= 17) greet = "Good evening";
+
+  (async () => {
+   try {
+    const { data: { session } } = await supabaseClient.auth.getSession();
+    if (!session) { window.location.href = "login.html"; return; }
+
+    const { data: profile, error: profileError } = await supabaseClient.from('profiles').select('*').eq('id', session.user.id).maybeSingle();
+    if (profileError) console.error('Profile fetch error:', profileError);
+
+    const name = profile?.name || "Student";
+    document.getElementById('greetText').textContent = greet + ", " + name;
+    document.getElementById('xpAmount').textContent = profile?.total_xp ?? 0;
+    document.getElementById('classLine').textContent = profile ? ((profile.class_selected ? "Class " + profile.class_selected + " · " : "") + (profile.board || "") + (profile.medium ? " · " + profile.medium + " Medium" : "")) : "Complete onboarding";
+
+    const { count: unreadCount } = await supabaseClient.from('notifications').select('*', { count: 'exact', head: true }).eq('user_id', session.user.id).eq('is_read', false);
+    if (unreadCount > 0) document.getElementById('notifDot').style.display = 'block';
+
+    const { data: attempts } = await supabaseClient.from('test_attempts').select('*, chapters(title)').eq('user_id', session.user.id).order('created_at', { ascending: false }).limit(1);
+    if (attempts && attempts.length > 0) {
+      const a = attempts[0];
+      const percent = Math.round((a.score / a.total) * 100);
+      document.getElementById('lastTestCard').innerHTML = `<div style="display:flex; align-items:center; gap:14px;"><div class="score-circle">${percent}%</div><div class="test-info"><h4>${a.chapters?.title || 'Chapter Test'}</h4><p>${a.score}/${a.total} correct</p></div></div><a href="test-history.html" class="view-link">View →</a>`;
+      document.getElementById('lastTestSection').style.display = 'block';
+    }
+
+    const { data: allXp } = await supabaseClient.from('xp_transactions').select('created_at').eq('user_id', session.user.id).gt('amount', 0);
+    if (allXp && allXp.length > 0) {
+      const uniqueDays = new Set(allXp.map(x => x.created_at.slice(0,10)));
+      let streak = 0; let d = new Date();
+      while (uniqueDays.has(d.toISOString().slice(0,10))) { streak++; d.setDate(d.getDate() - 1); }
+      document.getElementById('streakNum').textContent = streak + (streak === 1 ? ' Day' : ' Days');
+    }
+   } catch(e) { console.error('Home dashboard error:', e); }
+  })();
+</script>
+</body>
+</html>
